@@ -5,6 +5,9 @@ import withStyles from 'react-jss'
 const styles = {
   root: {
     position: 'fixed',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     top: 0,
     bottom: 0,
     left: 0,
