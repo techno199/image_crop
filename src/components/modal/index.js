@@ -8,7 +8,8 @@ const styles = {
     top: 0,
     bottom: 0,
     left: 0,
-    right: 0
+    right: 0,
+    background: 'rgba(0, 0, 0, .7)'
   }
 }
 
@@ -30,7 +31,12 @@ class Modal extends Component {
   }
 
   render() {
-    const { classes, children, open } = this.props
+    const { 
+      classes, 
+      children, 
+      open 
+    } = this.props
+
     return (
       <div 
         ref={this.backgroundRef}
