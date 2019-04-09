@@ -40,10 +40,9 @@ class Modal extends Component {
       open 
     } = this.props
 
-    return (
+    return open && (
       <div 
         ref={this.backgroundRef}
-        hidden={!open} 
         className={classes.root} 
         onClick={this.handleOuterClick}
       >
