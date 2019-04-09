@@ -1,9 +1,22 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { Modal } from './components/modal'
 
 class App extends Component {
+  state = {
+    modalOpen: false
+  }
+
+  handleToggleButton = e => {
+    this.setState(oldState => ({
+      modalOpen: !oldState.modalOpen
+    }))
+  }
+
   render() {
+    const { modalOpen } = this.state
+
     return (
       <div className="App">
         <header className="App-header">
@@ -19,6 +32,12 @@ class App extends Component {
           >
             Learn React
           </a>
+          <button onClick={this.handleToggleButton}>
+            Toggle modal
+          </button>
+          <Modal open={modalOpen} onOuterClick={this.handleToggleButton}>
+            <span>Some content</span>
+          </Modal>
         </header>
       </div>
     );
