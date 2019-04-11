@@ -44,7 +44,7 @@ class Modal extends Component {
       <div 
         ref={this.backgroundRef}
         className={classes.root} 
-        onClick={this.handleOuterClick}
+        onMouseDown={this.handleOuterClick}
       >
         {children}
       </div>
