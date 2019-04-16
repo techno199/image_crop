@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { Modal } from './components/modal'
+import { ImageCrop } from './components/imageCrop';
+import { Button } from './components/button';
+import { Modal } from './components/modal';
+import { DragDropContextProvider } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
 class App extends Component {
   state = {
@@ -18,28 +21,23 @@ class App extends Component {
     const { modalOpen } = this.state
 
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <button onClick={this.handleToggleButton}>
-            Toggle modal
-          </button>
-          <Modal open={modalOpen} onOuterClick={this.handleToggleButton}>
-            <span>Some content</span>
-          </Modal>
-        </header>
-      </div>
+      <DragDropContextProvider backend={HTML5Backend}>
+        <div className="App">
+          <header className="App-header">
+            <Button onClick={this.handleToggleButton}>
+              Toggle modal
+            </Button>
+            <Modal 
+              open={modalOpen}
+              onOuterClick={this.handleToggleButton}
+            >
+              <ImageCrop 
+                title='Выберите фотографию для вашей страницы'
+              />
+            </Modal>
+          </header>
+        </div>
+      </DragDropContextProvider>
     );
   }
 }
