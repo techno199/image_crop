@@ -5,21 +5,26 @@ import { ItemTypes } from '../../../helpers';
 import { DragSource } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import classNames from 'classnames'
+import update from 'immutability-helper'
 
 const styles = {
   root: {
     position: 'absolute',
-    overflow: 'hidden',
     cursor: 'move'
   },
-  img: {
-    position: 'absolute'
+  imgWrap: {
+    overflow: 'hidden',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0
   }
 }
 
 class SelectionArea extends Component {
   static propTypes = {
-    classes: PropTypes.object,
+    classes: PropTypes.object.isRequired,
     /** Describes absolute top offset */
     top: PropTypes.number.isRequired,
     /** Describes absolute left offset */
@@ -28,6 +33,14 @@ class SelectionArea extends Component {
     width: PropTypes.number.isRequired,
     /** Area height */
     height: PropTypes.number.isRequired,
+    /** Classes to be merged */
+    className: PropTypes.string,
+    /** Image source */
+    src: PropTypes.string.isRequired,
+    /** Image width */
+    imgWidth: PropTypes.number.isRequired,
+    /** Image height */
+    imgHeight: PropTypes.number.isRequired
   }
 
   areaRef = React.createRef()
@@ -57,8 +70,8 @@ class SelectionArea extends Component {
     const imgStyles = {
       width: imgWidth,
       height: imgHeight,
-      top: -top,
-      left: -left,
+      marginTop: -top,
+      marginLeft: -left,
     }
 
     connectDragPreview(getEmptyImage())
@@ -70,10 +83,13 @@ class SelectionArea extends Component {
         ref={this.areaRef}
         {...other}
       >
-        <img 
-          style={imgStyles}
-          src={src}
-          className={classes.img} />
+        <div className={classes.imgWrap}>
+          <img 
+            style={imgStyles}
+            src={src}
+          />
+        </div>
+        {this.props.children}
       </div>
     )
   }
@@ -90,11 +106,12 @@ const SelectionAreaHOC = DragSource(
         left: rect.left,
         bottom: rect.bottom,
         width: props.width,
-        height: props.height
+        height: props.height,
+
       }
     }
   },
-  connect => ({
+  (connect, monitor) => ({
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview()
   })
