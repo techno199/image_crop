@@ -42,6 +42,11 @@ export default {
     extend: 'rotateClockwise',
     right: 0
   },
+  rotationButtons: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0
+  },
   previewImage: {
     userSelect: 'none',
   },
@@ -65,12 +70,10 @@ export default {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, .4)'
-  },
-  imgWrap: {
-    maxHeight: 450
+    backgroundColor: '#000',
+    opacity: 0.7
   },
   area: {
-    zIndex: 10
+
   }
 }

@@ -6,12 +6,9 @@ import { ReactComponent as RotateAntiClockwiseIcon } from '../../img/rotate_left
 import { ReactComponent as RotateClockwiseIcon } from '../../img/rotate_right.svg'
 import { Button } from '../button';
 import styles from './imageCrop.styles'
-import { DropTarget } from 'react-dnd';
-import { ItemTypes } from '../../helpers';
-import { SelectionArea } from './selectionArea';
-
-const MAX_IMAGE_DIMENSION_LENGHT = 604
-const MIN_IMAGE_DIMENSION_LENGHT = 200
+import { Cropper } from './cropper';
+import update from 'immutability-helper'
+import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT } from '../../helpers';
 
 class ImageCrop extends Component {
   static propTypes = {
@@ -27,6 +24,8 @@ class ImageCrop extends Component {
     imgSrc: null,
     /** Current rotation level */
     imgRotationDegree: 0,
+    /** Image rectangle */
+    imgRect: null,
     /** Calculated width */
     resizedImageWidth: null,
     /** Calculated height */
@@ -36,10 +35,6 @@ class ImageCrop extends Component {
       left: 0,
       width: MIN_IMAGE_DIMENSION_LENGHT,
       height: MIN_IMAGE_DIMENSION_LENGHT,
-    },
-    imgContainer: {
-      width: 0,
-      height: 0
     }
   }
   // Component refs
@@ -102,6 +97,10 @@ class ImageCrop extends Component {
     }
   }
 
+  componentWillUpdate = () => {
+
+  }
+
   /**
    * Converts loaded image to url and saves to state
    */
@@ -129,16 +128,8 @@ class ImageCrop extends Component {
 
   /** Update selected area properties*/
   updateArea = (area) => {
-    this.setState(oldState => {
-      let updatedArea = Object.assign(
-        {}, 
-        oldState.area, 
-        area
-      )
-
-      return {
-        area: updatedArea
-      }
+    this.setState({
+      area: update(this.state.area, { $merge: area })
     })
   }
   
@@ -146,11 +137,16 @@ class ImageCrop extends Component {
     console.log(e)
   }
 
+  handleCropperRectUpdate = rect => {
+    this.setState({
+      imgRect: rect
+    })
+  }
+
   render() {
     const { 
       classes,
       title,
-      connectDropTarget
     } = this.props
 
     const { 
@@ -159,7 +155,8 @@ class ImageCrop extends Component {
       imgRotationDegree,
       area,
       resizedImageHeight,
-      resizedImageWidth
+      resizedImageWidth,
+      imgRect
     } = this.state
 
     // Next code block ensures that image is being rotated 
@@ -181,158 +178,73 @@ class ImageCrop extends Component {
       width: resizedImageWidth,
       height: resizedImageHeight
     }
-    let innerImageContainerStyle = {
-      width: resizedImageWidth,
-      height: resizedImageHeight
-    }
-    let imgStyle = {
-      transform: `rotate(${imgRotationDegree}deg)`,
-      width: resizedImageWidth,
-      height: resizedImageHeight
-    }
-    let rotateClockStyle = { 
-      right: imgWidthHeightDelta / 2 + 24,
-      bottom: -imgWidthHeightDelta / 2 + 5
-    }
-    let rotateAntiClockStyle = {
-      right: imgWidthHeightDelta / 2,
-      bottom: -imgWidthHeightDelta / 2 + 5
-    }
 
     return (
-        <Paper className={classes.root}>
-          <div className={classes.title}>
-            {title}
-          </div>
-          <div className={classes.cropWrap}>
-            {
-              isImgSelected ? (
-              <div>
-                <div className={classes.descriptionWrap}>
-                  Выберите область изображения
-                </div>
-                <div 
-                  className={classes.outerImage}
-                  style={outerImageContainerStyle}
-                >
-                  {
-                    connectDropTarget(
-                      <div 
-                        className={classes.imgWrap}
-                        style={innerImageContainerStyle}
-                      >
-                        <img
-                          style={imgStyle}
-                          className={classes.previewImage}
-                          src={imgSrc}
-                          ref={this.imgRef} 
-                          alt='Preview' 
-                          onClick={this.handleImageClick}
-                        />
-                        <SelectionArea
-                          className={classes.area}
-                          top={area.top}
-                          left={area.left}
-                          width={area.width}
-                          height={area.height}
-                          imgWidth={resizedImageWidth}
-                          imgHeight={resizedImageHeight}
-                          src={imgSrc}
-                        />
-                        <div className={classes.imgFade} />
-                      </div>
-                    )
-                  }
+      <Paper className={classes.root}>
+        <div className={classes.title}>
+          {title}
+        </div>
+        <div className={classes.cropWrap}>
+          {
+            isImgSelected ? (
+            <div>
+              <div className={classes.descriptionWrap}>
+                Выберите область изображения
+              </div>
+              <div 
+                className={classes.outerImage}
+                style={outerImageContainerStyle}
+              >
+                <Cropper
+                  height={resizedImageHeight}
+                  width={resizedImageWidth}
+                  areaTop={area.top}
+                  areaLeft={area.left}
+                  areaHeight={area.height}
+                  areaWidth={area.width}
+                  imgSrc={imgSrc}
+                  rotationDegree={imgRotationDegree}
+                  onImageClick={this.handleImageClick}
+                  onRectUpdate={this.handleCropperRectUpdate}
+                  rect={imgRect}
+                  onAreaUpdate={this.updateArea}
+                />
+                <div className={classes.rotationButtons}>
                   <RotateAntiClockwiseIcon
-                    style = {rotateClockStyle}
                     className={classes.rotateClockwise}
                     onClick={this.handleRotateClick(-90)}
                   />
                   <RotateClockwiseIcon
-                    style = {rotateAntiClockStyle}
                     className={classes.rotateAntiClockwise}
                     onClick={this.handleRotateClick(90)}
                   />
                 </div>
-                <div className={classes.bottomLine} />
-                <div className={classes.bottomButtonWrap}>
-                  <Button className={classes.saveButton}>Сохранить</Button>
-                </div>
               </div>
-              ) : (
-                <div>
-                  <Button onClick={this.handleSelectFileClick}>
-                    Выбрать файл
-                  </Button>
-                  <input 
-                    ref={this.fileInputRef} 
-                    className={classes.input}
-                    type='file' 
-                    onChange={this.handleSelectedImageChange} 
-                  />
-                </div>
-              )
-            }
-          </div>
-        </Paper>
+              <div className={classes.bottomLine} />
+              <div className={classes.bottomButtonWrap}>
+                <Button className={classes.saveButton}>Сохранить</Button>
+              </div>
+            </div>
+            ) : (
+              <div>
+                <Button onClick={this.handleSelectFileClick}>
+                  Выбрать файл
+                </Button>
+                <input 
+                  ref={this.fileInputRef} 
+                  className={classes.input}
+                  type='file' 
+                  onChange={this.handleSelectedImageChange} 
+                />
+              </div>
+            )
+          }
+        </div>
+      </Paper>
     )
   }
 }
 
-const ImageCropHOC = DropTarget(
-  ItemTypes.BOX,
-  {
-    hover: (props, monitor, component) => {
-      // Get container data
-      let containerNode = component.imgRef.current
-      let containerRect = containerNode.getBoundingClientRect()
-      /** Inintial area rect */
-      let areaRect = monitor.getItem()
-      // Container dimensions
-      let containerWidth = containerRect.right - containerRect.left
-      let containerHeight = containerRect.bottom - containerRect.top
-      /** Initial cursor location */
-      let initOffset = monitor.getInitialClientOffset()
-      /** Current offset */
-      let currentOffset = monitor.getClientOffset()
-      /** Cursor absolute offset */
-      let cursorAbsoluteOffset = {
-        x: currentOffset.x - containerRect.left,
-        y: currentOffset.y - containerRect.top,
-      }
-      /** Area box absolute offset */
-      let areaAbsoluteOffset = {
-        left: cursorAbsoluteOffset.x - (initOffset.x - areaRect.left),
-        right: cursorAbsoluteOffset.x + (areaRect.right - initOffset.x),
-        top: cursorAbsoluteOffset.y - (initOffset.y - areaRect.top),
-        bottom: cursorAbsoluteOffset.y + (areaRect.bottom - initOffset.y)
-      }
-      /** Fixed left offset to be rendered */
-      let fixedAreaLeftOffset = areaAbsoluteOffset.left
-      if (areaAbsoluteOffset.left < 0)
-        fixedAreaLeftOffset = 0
-      else if (areaAbsoluteOffset.right > containerWidth)
-        fixedAreaLeftOffset = containerWidth - areaRect.width - 1
-      /** Fixed top offset to be rendered */
-      let fixedAreaTopOffset = areaAbsoluteOffset.top
-      if (areaAbsoluteOffset.top < 0)
-        fixedAreaTopOffset = 0
-      else if (areaAbsoluteOffset.bottom > containerHeight)
-        fixedAreaTopOffset = containerHeight - areaRect.height - 1
-      // Move actual area
-      component.updateArea({
-        top: fixedAreaTopOffset,
-        left: fixedAreaLeftOffset
-      })
-    }
-  },
-  connect => ({
-    connectDropTarget: connect.dropTarget()
-  })
-)(
-  ImageCrop
-)
-
-const ImageCropStyled = withStyles(styles)(ImageCropHOC)
+const ImageCropStyled = withStyles(styles)(ImageCrop)
 
 export { ImageCropStyled as ImageCrop }
