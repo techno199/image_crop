@@ -9,9 +9,10 @@ export const resizeArea = (props, monitor) => {
     width,
     onAreaUpdate,
     height,
-    rect
+    imgRef
   } = props
 
+  let rect = imgRef.current.getBoundingClientRect()
   /** Currently dragged tag type */
   let tagType = monitor.getItem().type
   /** Current offset */
@@ -21,6 +22,7 @@ export const resizeArea = (props, monitor) => {
     x: currentOffset.x - rect.left,
     y: currentOffset.y - rect.top,
   }
+  console.log(`{x: ${rect.left};y: ${rect.top}}`)
 
   // Move around respecting currenlty selected tag
   switch (tagType) {

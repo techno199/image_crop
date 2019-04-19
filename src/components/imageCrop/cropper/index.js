@@ -53,14 +53,12 @@ const Cropper = ({
         })
     }
   )
-  // Update image rectangle on every new image
+  // Update image ref on every new image
   useEffect(() => {
     return () => {
-      let rect
       if (imgRef.current) {
-        rect = imgRef.current.getBoundingClientRect()
         onRectUpdate &&
-          onRectUpdate(rect)
+          onRectUpdate(imgRef)
       }
     };
   }, [imgRef.current])
@@ -115,7 +113,7 @@ const CropperHOC = DropTarget(
   ],
   {
     hover: (props, monitor) => {
-      if (!props.rect) return
+      if (!props.imgRef) return
       switch (monitor.getItemType()) {
         case ItemTypes.BOX:
             moveArea(props, monitor)

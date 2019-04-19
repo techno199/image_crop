@@ -4,17 +4,22 @@ import withStyles from 'react-jss'
 import { Paper } from '../paper';
 import { ReactComponent as RotateAntiClockwiseIcon } from '../../img/rotate_left.svg'
 import { ReactComponent as RotateClockwiseIcon } from '../../img/rotate_right.svg'
+import { ReactComponent as CloseIcon } from '../../img/close.svg'
+import CatsImg from '../../img/cats.jpg'
 import { Button } from '../button';
 import styles from './imageCrop.styles'
 import { Cropper } from './cropper';
 import update from 'immutability-helper'
-import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT } from '../../helpers';
+import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT, ErrorTypes } from '../../helpers';
 
 class ImageCrop extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     open: PropTypes.bool,
-    onClose: PropTypes.func
+    /** Callback on close button clicked */
+    onClose: PropTypes.func,
+    /** Callback on loading error provided with message */
+    onErrorLoadingImage: PropTypes.func
   }
 
   state = {
@@ -25,7 +30,7 @@ class ImageCrop extends Component {
     /** Current rotation level */
     imgRotationDegree: 0,
     /** Image rectangle */
-    imgRect: null,
+    imgRef: React.createRef(),
     /** Calculated width */
     resizedImageWidth: null,
     /** Calculated height */
@@ -39,7 +44,6 @@ class ImageCrop extends Component {
   }
   // Component refs
   fileInputRef = React.createRef()
-  imgRef = React.createRef()
   // Other props
   reader = new FileReader()
   image = new Image()
@@ -47,15 +51,11 @@ class ImageCrop extends Component {
   componentDidMount = () => {
     // Process each next file loaded to reader
     this.reader.addEventListener('load', () => {
-      // Load image to this.image in order to get original width and height
+      // Load and preprocess image
       this.image.src = this.reader.result
-
-      // this.setState({
-      //   imgSrc: this.reader.result
-      // }) 
     }, false)
 
-    // Process given image
+    // Process given image on load
     this.image.onload = (e) => {
       let originalWidth = this.image.width
       let originalHeight = this.image.height
@@ -63,16 +63,18 @@ class ImageCrop extends Component {
       // Check image aspect ration rules on load
       if (
         originalWidth / originalHeight <= 0.25 ||
-        originalWidth / originalHeight >= 3) {
-        alert('Image aspect ration must follow next formula: 0.25 < ratio < 3')
+        originalWidth / originalHeight >= 3
+      ) {
+        this.props.onErrorLoadingImage &&
+          this.props.onErrorLoadingImage(ErrorTypes.WRONG_IMAGE_ASPECT_RATIO)
         return
       }
-      // Check image original width and height rules
       if (
         originalWidth < MIN_IMAGE_DIMENSION_LENGHT ||
         originalHeight < MIN_IMAGE_DIMENSION_LENGHT
       ) {
-        alert('Image must be at least 200x200px')
+        this.props.onErrorLoadingImage &&
+          this.props.onErrorLoadingImage(ErrorTypes.IMAGE_TOO_SMALL)
         return
       }
       // Resize exaggerated image
@@ -89,14 +91,16 @@ class ImageCrop extends Component {
         resizedImageWidth = MAX_IMAGE_DIMENSION_LENGHT
         resizedImageHeight = resizedImageHeight / aspectRatio
       }
-      // Set default area center to image center
+      // Set default image center
       let initialAreaTop = resizedImageHeight / 2 - MIN_IMAGE_DIMENSION_LENGHT / 2
       let initialAreaLeft = resizedImageWidth / 2 - MIN_IMAGE_DIMENSION_LENGHT / 2
 
       this.setState({
         area: update(this.state.area, {
           top: { $set: initialAreaTop },
-          left: { $set: initialAreaLeft }
+          left: { $set: initialAreaLeft },
+          width: { $set: Math.min(MIN_IMAGE_DIMENSION_LENGHT, resizedImageWidth) },
+          height: { $set: Math.min(MIN_IMAGE_DIMENSION_LENGHT, resizedImageHeight) }
         }),
         resizedImageWidth,
         resizedImageHeight,
@@ -106,8 +110,17 @@ class ImageCrop extends Component {
     }
   }
 
-  componentWillUpdate = () => {
+  /** Callback on close click */
+  handleClose = () => {
+    this.props.onClose &&
+      this.props.onClose()
+  }
 
+  /** Resets selected image */
+  handleGoBackClick = () => {
+    this.setState({
+      isImgSelected: false
+    })
   }
 
   /**
@@ -128,7 +141,16 @@ class ImageCrop extends Component {
     }
   }
 
-  /** Transforms image for give degree diff */
+  /**
+   * Just.
+   * Handle.
+   * A cat.
+   */
+  handleCat = () => {
+    this.image.src = CatsImg
+  }
+
+  /** Transforms image for given degree diff */
   handleRotateClick = deltaDegree => () => {
     this.setState(oldState => ({
       imgRotationDegree: oldState.imgRotationDegree + deltaDegree
@@ -168,10 +190,11 @@ class ImageCrop extends Component {
       height: MIN_IMAGE_CROP_DIMENSION_LENGHT
     })
   }
-
-  handleCropperRectUpdate = rect => {
+  
+  /** Update image reference */
+  handleCropperRectUpdate = ref => {
     this.setState({
-      imgRect: rect
+      imgRef: ref
     })
   }
 
@@ -188,19 +211,19 @@ class ImageCrop extends Component {
       area,
       resizedImageHeight,
       resizedImageWidth,
-      imgRect
+      imgRef
     } = this.state
 
     // Next code block ensures that image is being rotated 
     // and, if it is, adjusts margin of wrapper
     let imgWidthHeightDelta = 0
-    if (this.imgRef.current) {
+    if (imgRef.current) {
       let isRotated = Boolean((imgRotationDegree / 90) % 2)
       
       if (isRotated) {
         imgWidthHeightDelta = Math.abs(
-          this.imgRef.current.clientWidth - 
-          this.imgRef.current.clientHeight
+          imgRef.current.clientWidth - 
+          imgRef.current.clientHeight
         )
       }
     }
@@ -210,11 +233,15 @@ class ImageCrop extends Component {
       width: resizedImageWidth,
       height: resizedImageHeight
     }
-
     return (
       <Paper className={classes.root}>
         <div className={classes.title}>
-          {title}
+          <span className={classes.titleText}>
+            {title}
+          </span>
+          <div className={classes.close}>
+            <CloseIcon onClick={this.handleClose}/>
+          </div>
         </div>
         <div className={classes.cropWrap}>
           {
@@ -235,9 +262,9 @@ class ImageCrop extends Component {
                   areaHeight={area.height}
                   areaWidth={area.width}
                   imgSrc={imgSrc}
+                  imgRef={imgRef}
                   rotationDegree={imgRotationDegree}
                   onRectUpdate={this.handleCropperRectUpdate}
-                  rect={imgRect}
                   onAreaUpdate={this.updateArea}
                   onFadedSpaceClick={this.handleFadedSpaceClick}
                 />
@@ -253,14 +280,21 @@ class ImageCrop extends Component {
                 </div>
               </div>
               <div className={classes.bottomLine} />
-              <div className={classes.bottomButtonWrap}>
-                <Button className={classes.saveButton}>Сохранить</Button>
+              <div className={classes.footer}>
+                <Button className={classes.btn}>Сохранить</Button>
+                <Button onClick={this.handleGoBackClick}>Назад</Button>
               </div>
             </div>
             ) : (
-              <div>
-                <Button onClick={this.handleSelectFileClick}>
-                  Выбрать файл
+              <div className={classes.footer}>
+                <Button 
+                  onClick={this.handleSelectFileClick}
+                  className={classes.btn}
+                >
+                  Выбрать фото
+                </Button>
+                <Button onClick={this.handleCat}>
+                  Выбрать кота
                 </Button>
                 <input 
                   ref={this.fileInputRef} 
