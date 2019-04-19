@@ -7,7 +7,6 @@ export default {
   title: {
     minHeight: 54,
     paddingLeft: 25,
-    paddingRight: 25,
     display: 'flex',
     alignItems: 'center',
     borderBottom: '1px solid #86838357',
@@ -54,15 +53,8 @@ export default {
     display: 'none'
   },
   bottomLine: {
-    borderBottom: '1px solid #86838357'
-  },
-  saveButton: {
-    marginTop: 8
-  },
-  bottomButtonWrap: {
-    marginTop: 20,
-    display: 'flex',
-    justifyContent: 'center'
+    borderBottom: '1px solid #86838357',
+    marginBottom: 25
   },
   imgFade: {
     position: 'absolute',
@@ -73,7 +65,23 @@ export default {
     backgroundColor: '#000',
     opacity: 0.7
   },
-  area: {
-
+  titleText: {
+    flexGrow: 1
+  },
+  close: {
+    padding: '21px 25px 21px 12px',
+    fill: '#7b95b5',
+    cursor: 'pointer',
+    opacity: .75,
+    '&:hover': {
+      opacity: 1
+    }
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  btn: {
+    marginRight: 25
   }
 }
