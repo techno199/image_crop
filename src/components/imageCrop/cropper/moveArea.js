@@ -1,5 +1,5 @@
 /** Get fixed allowed offset */
-export const moveArea = ({
+export const fixedMoveAreaOffset = ({
   width,
   height,
   item,
