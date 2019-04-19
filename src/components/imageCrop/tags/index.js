@@ -41,66 +41,16 @@ class Tags extends Component {
       isDragging,
       ...other
     } = this.props
-    let tags = [
-      {
-        type: TagTypes.NW,
-        top: (- TAG_WIDTH / 2),
-        left: (- TAG_WIDTH / 2),
-        cursor: 'nw-resize'
-      },
-      {
-        type: TagTypes.N,
-        top: - TAG_WIDTH / 2,
-        left: width / 2 - TAG_WIDTH / 2,
-        cursor: 'n-resize'
-      },
-      {
-        type: TagTypes.NE,
-        top: - TAG_WIDTH / 2,
-        left: width - TAG_WIDTH / 2,
-        cursor: 'ne-resize'
-      },
-      {
-        type: TagTypes.E,
-        top: height / 2 - TAG_WIDTH / 2,
-        left: width - TAG_WIDTH / 2,
-        cursor: 'e-resize'
-      },
-      {
-        type: TagTypes.SE,
-        top: height - TAG_WIDTH / 2,
-        left: width - TAG_WIDTH / 2,
-        cursor: 'se-resize'
-      },
-      {
-        type: TagTypes.S,
-        top: height - TAG_WIDTH / 2,
-        left: width / 2 - TAG_WIDTH / 2,
-        cursor: 's-resize'
-      },
-      {
-        type: TagTypes.SW,
-        top: height - TAG_WIDTH / 2,
-        left: - TAG_WIDTH / 2,
-        cursor: 'sw-resize'
-      },
-      {
-        type: TagTypes.W,
-        top: height / 2 - TAG_WIDTH / 2,
-        left: - TAG_WIDTH / 2,
-        cursor: 'w-resize'
-      }
-    ]
-
+    let tags = Object.keys(TagTypes).map(type => TagTypes[type])
+    
     return (
       <div {...other}>
         {
-          tags.map(({type, ...style}) => (
+          tags.map(type => (
             <Tag 
               key={type}
               type={type}
               isHighlighted={isDragging}
-              style={{...style}}
             />
           ))
         }
