@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { DragSource } from 'react-dnd';
-import { ItemTypes, TagTypes } from '../../../../helpers';
+import { TagTypes, movePreview } from '../../../../helpers';
 import withStyles from 'react-jss'
 import classNames from 'classnames'
-import { getEmptyImage } from 'react-dnd-html5-backend'
 
 export const TAG_WIDTH = 10
 
@@ -62,16 +60,20 @@ const styles = {
 class Tag extends Component {
   static propTypes = {
     classes: PropTypes.object,
-    connectDragSource: PropTypes.func.isRequired,
-    connectDragPreview: PropTypes.func.isRequired,
     /** Defines tag type */
     type: PropTypes.string.isRequired,
     /** Highlight square */
-    isHighlighted: PropTypes.bool
+    isHighlighted: PropTypes.bool,
+    /** Drag callback */
+    onDrag: PropTypes.func,
+    onDragStart: PropTypes.func,
+    onDragEnd: PropTypes.func
   }
 
   state = {
-    tagName: ''
+    tagName: '',
+    item: null,
+    initClientOffset: null
   }
 
   componentDidMount = () => {
@@ -116,48 +118,76 @@ class Tag extends Component {
           tagName: this.props.classes.w
         })
         break
+      default: 
+        break
     }
+  }
+
+  handleDrag = e => {
+    const currentClientOffset = {
+      x: e.clientX,
+      y: e.clientY
+    }
+    // It returns {0, 0} at last tick
+    // so we ignore it
+    if (
+      currentClientOffset.x === 0 &&
+      currentClientOffset.y === 0
+    ) return
+
+    this.props.onDrag &&
+      this.props.onDrag({
+        initClientOffset: this.state.initClientOffset,
+        currentClientOffset,
+        item: this.state.item
+      })
+  }
+
+  handleDragStart = e => {
+    e.dataTransfer.setDragImage(movePreview, 0, 0)
+    let item = {
+      type: this.props.type
+    }
+    this.setState({
+      initClientOffset: {
+        x: e.clientX,
+        y: e.clientY
+      },
+      item
+    })
+    this.props.onDragStart &&
+      this.props.onDragStart(e)
+  }
+
+  handleDragEnd = e => {
+    this.props.onDragEnd &&
+      this.props.onDragEnd(e)
   }
 
   render() {
     const { 
-      connectDragSource,
-      connectDragPreview,
       classes,
       isHighlighted,
     } = this.props
     // Replace default stab with empty image
-    connectDragPreview(getEmptyImage())
     let hightlightStyle
     if (isHighlighted)
       hightlightStyle = {
         opacity: .7
       }
     
-    return connectDragSource(
+    return (
       <div
         className={classNames([classes.root, this.state.tagName])}
         style={hightlightStyle}
+        onDrag={this.handleDrag}
+        onDragStart={this.handleDragStart}
+        onDragEnd={this.handleDragEnd}
       />
     )
   }
 }
 
-const TagHOC = DragSource(
-  ItemTypes.TAG,
-  {
-    beginDrag: props => {
-      return {
-        type: props.type
-      }
-    }
-  },
-  connect => ({
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview()
-  })
-)(Tag)
-
-const TagStyled = withStyles(styles)(TagHOC)
+const TagStyled = withStyles(styles)(Tag)
 
 export { TagStyled as Tag }
