@@ -5,7 +5,6 @@ import { ItemTypes } from '../../../helpers';
 import { DragSource } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import classNames from 'classnames'
-import update from 'immutability-helper'
 
 const styles = {
   root: {
@@ -106,8 +105,7 @@ const SelectionAreaHOC = DragSource(
         left: rect.left,
         bottom: rect.bottom,
         width: props.width,
-        height: props.height,
-
+        height: props.height
       }
     }
   },

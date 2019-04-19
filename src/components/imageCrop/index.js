@@ -8,7 +8,7 @@ import { Button } from '../button';
 import styles from './imageCrop.styles'
 import { Cropper } from './cropper';
 import update from 'immutability-helper'
-import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT } from '../../helpers';
+import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT } from '../../helpers';
 
 class ImageCrop extends Component {
   static propTypes = {
@@ -73,11 +73,12 @@ class ImageCrop extends Component {
         originalHeight < MIN_IMAGE_DIMENSION_LENGHT
       ) {
         alert('Image must be at least 200x200px')
+        return
       }
       // Resize exaggerated image
       let aspectRatio
-      let resizedImageWidth
-      let resizedImageHeight
+      let resizedImageWidth = originalWidth
+      let resizedImageHeight = originalHeight
       if (originalHeight > MAX_IMAGE_DIMENSION_LENGHT) {
         aspectRatio = originalHeight / MAX_IMAGE_DIMENSION_LENGHT
         resizedImageHeight = MAX_IMAGE_DIMENSION_LENGHT
@@ -88,7 +89,15 @@ class ImageCrop extends Component {
         resizedImageWidth = MAX_IMAGE_DIMENSION_LENGHT
         resizedImageHeight = resizedImageHeight / aspectRatio
       }
+      // Set default area center to image center
+      let initialAreaTop = resizedImageHeight / 2 - MIN_IMAGE_DIMENSION_LENGHT / 2
+      let initialAreaLeft = resizedImageWidth / 2 - MIN_IMAGE_DIMENSION_LENGHT / 2
+
       this.setState({
+        area: update(this.state.area, {
+          top: { $set: initialAreaTop },
+          left: { $set: initialAreaLeft }
+        }),
         resizedImageWidth,
         resizedImageHeight,
         imgSrc: this.image.src,
@@ -133,8 +142,31 @@ class ImageCrop extends Component {
     })
   }
   
-  handleImageClick = e => {
-    console.log(e)
+  /** Replace current area with new one */
+  handleFadedSpaceClick = ({x, y}) => {
+    const { 
+      resizedImageHeight,
+      resizedImageWidth
+     } = this.state
+    // Fix top offset
+    let fixedTop = y - MIN_IMAGE_CROP_DIMENSION_LENGHT / 2
+    if (fixedTop < 0)
+      fixedTop = 0
+    else if (fixedTop > resizedImageHeight - MIN_IMAGE_CROP_DIMENSION_LENGHT)
+      fixedTop = resizedImageHeight - MIN_IMAGE_CROP_DIMENSION_LENGHT
+    // Fixed left offset
+    let fixedLeft = x - MIN_IMAGE_CROP_DIMENSION_LENGHT / 2
+    if (fixedLeft < 0)
+     fixedLeft = 0
+    else if (fixedLeft > resizedImageWidth - MIN_IMAGE_CROP_DIMENSION_LENGHT)
+      fixedLeft = resizedImageWidth - MIN_IMAGE_CROP_DIMENSION_LENGHT
+    
+    this.updateArea({
+      top: fixedTop,
+      left: fixedLeft,
+      width: MIN_IMAGE_CROP_DIMENSION_LENGHT,
+      height: MIN_IMAGE_CROP_DIMENSION_LENGHT
+    })
   }
 
   handleCropperRectUpdate = rect => {
@@ -204,10 +236,10 @@ class ImageCrop extends Component {
                   areaWidth={area.width}
                   imgSrc={imgSrc}
                   rotationDegree={imgRotationDegree}
-                  onImageClick={this.handleImageClick}
                   onRectUpdate={this.handleCropperRectUpdate}
                   rect={imgRect}
                   onAreaUpdate={this.updateArea}
+                  onFadedSpaceClick={this.handleFadedSpaceClick}
                 />
                 <div className={classes.rotationButtons}>
                   <RotateAntiClockwiseIcon

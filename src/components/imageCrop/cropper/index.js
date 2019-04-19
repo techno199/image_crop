@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import withStyles from 'react-jss'
 import { SelectionArea } from '../selectionArea';
@@ -19,7 +19,8 @@ const styles = {
     right: 0,
     bottom: 0,
     backgroundColor: '#000',
-    opacity: 0.7
+    opacity: 0.7,
+    cursor: 'crosshair'
   }
 }
 
@@ -33,19 +34,26 @@ const Cropper = ({
   areaLeft,
   areaWidth,
   areaHeight,
-  onImageClick,
   onRectUpdate,
   connectDropTarget,
-  isOver
+  isOver,
+  onFadedSpaceClick
 }) => {
   // image ref
   const imgRef = useRef(null)
 
-  const handleImageClick = e => {
-    onImageClick &&
-      onImageClick(e)
-  }
-  // Fire callback each time we receive new valid rectangle
+  /**Occurs on faded cropper part clicked */
+  const handleFadeClick = useCallback(
+    (e) => {
+      let rect = imgRef.current.getBoundingClientRect()
+      onFadedSpaceClick &&
+        onFadedSpaceClick({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        })
+    }
+  )
+  // Update image rectangle on every new image
   useEffect(() => {
     return () => {
       let rect
@@ -75,9 +83,11 @@ const Cropper = ({
         src={imgSrc}
         ref={imgRef} 
         alt='Preview' 
-        onClick={handleImageClick}
       />
-      <div className={classes.imgFade} />
+      <div 
+        className={classes.imgFade} 
+        onClick={handleFadeClick}
+      />
       <SelectionArea
         className={classes.area}
         top={areaTop}
@@ -141,5 +151,7 @@ Cropper.propTypes = {
   rect: PropTypes.object,
   onRectUpdate: PropTypes.func,
   /** Called each time area is updated */
-  onAreaUpdate: PropTypes.func.isRequired
+  onAreaUpdate: PropTypes.func.isRequired,
+  /** Called when empty faded point is clicked. Returns {x, y} absolute coordinates */
+  onFadedSpaceClick: PropTypes.func
 }

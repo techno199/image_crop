@@ -1,3 +1,4 @@
+/** Describes the rules for area movement */
 export const moveArea = (props, monitor) => {
   // Get container data
   let containerRect = props.rect
