@@ -1,22 +1,22 @@
 import { TagTypes, MIN_IMAGE_CROP_DIMENSION_LENGHT, MIN_RESIZE_RATIO, MAX_RESIZE_RATIO } from "../../../helpers";
 
-export const resizeArea = (props, monitor) => {
-  let {
-    areaTop,
-    areaLeft,
-    areaHeight,
-    areaWidth,
-    width,
-    onAreaUpdate,
-    height,
-    imgRef
-  } = props
-
+export const resizeArea = ({
+  areaTop,
+  areaLeft,
+  areaHeight,
+  areaWidth,
+  width,
+  height,
+  imgRef,
+  item,
+  currentClientOffset,
+  onAreaUpdate
+}) => {
   let rect = imgRef.current.getBoundingClientRect()
   /** Currently dragged tag type */
-  let tagType = monitor.getItem().type
+  let tagType = item.type
   /** Current offset */
-  let currentOffset = monitor.getClientOffset()
+  let currentOffset = currentClientOffset
   /** Cursor absolute offset*/
   let cursorAbsoluteOffset = {
     x: currentOffset.x - rect.left,
@@ -74,12 +74,14 @@ export const resizeArea = (props, monitor) => {
         height: areaHeight - getFixedBottomDelta(height, areaTop, areaWidth, areaHeight, cursorAbsoluteOffset),
         width: areaWidth + getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset)
       })
+      break
     }
     case TagTypes.W: {
       onAreaUpdate({
         left: areaLeft - getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
         width: areaWidth + getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset)
       })
+      break
     }
     default:
       break

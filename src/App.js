@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import { ImageCrop } from './components/imageCrop';
-import { Button } from './components/button';
-import { Modal } from './components/modal';
 import { DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 

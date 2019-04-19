@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import withStyles from 'react-jss'
-import { ItemTypes, movePreview } from '../../../helpers';
-import { DragSource } from 'react-dnd';
+import { movePreview } from '../../../helpers';
 import classNames from 'classnames'
 
 const styles = {
@@ -16,7 +15,8 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0
+    bottom: 0,
+    userSelect: 'none'
   }
 }
 
@@ -61,10 +61,6 @@ class SelectionArea extends Component {
   areaRef = React.createRef()
 
   handleDrag = e => {
-    const { 
-      imgWidth,
-      imgHeight
-    } = this.props
     const currentClientOffset = {
       x: e.clientX,
       y: e.clientY
@@ -80,9 +76,7 @@ class SelectionArea extends Component {
       this.props.onHover({
         initClientOffset: this.state.initClientOffset,
         currentClientOffset,
-        item: this.state.item,
-        width: imgWidth,
-        height: imgHeight
+        item: this.state.item
       })
   }
 
@@ -160,6 +154,7 @@ class SelectionArea extends Component {
             onDrag={this.handleDrag}
             onDragStart={this.handleDragStart}
             onDragEnd={this.handleDragEnd}
+            alt=''
           />
         </div>
         {this.props.children}

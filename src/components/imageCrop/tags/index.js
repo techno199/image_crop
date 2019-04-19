@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 import withStyles from 'react-jss'
-import { DragSource } from 'react-dnd';
-import { ItemTypes, TagTypes } from '../../../helpers';
-import { Tag, TAG_WIDTH } from './tag';
+import { TagTypes } from '../../../helpers';
+import { Tag } from './tag';
 
 const styles = {
 
@@ -17,40 +15,58 @@ class Tags extends Component {
     width: PropTypes.number.isRequired,
     /** Selected area height */
     height: PropTypes.number.isRequired,
-    /** Hightlight squares when area is being dragged */
-    isDragging: PropTypes.bool
+    /** Tag dragging callback */
+    onTagDrag: PropTypes.func
   }
 
-  shouldComponentUpdate = (nextProps) => {
+  state = {
+    isDragging: false
+  }
+
+  shouldComponentUpdate = (nextProps, nextState) => {
     // Huge performance improvement
     if (
       this.props.width === nextProps.width &&
       this.props.height === nextProps.height &&
-      this.props.isDragging === nextProps.isDragging
+      this.state.isDragging === nextState.isDragging
     ) return false
     return true
   }
 
+  handleTagDrag = e => {
+    this.props.onTagDrag &&
+      this.props.onTagDrag(e)
+  }
+
+  handleTagDragEnd = e => {
+    this.setState({
+      isDragging: false
+    })
+  }
+
+  handleTagDragStart = e => {
+    this.setState({
+      isDragging: true
+    })
+  }
+
   render() {
     const { 
-      classes,
-      className,
-      width,
-      height,
-      connectDragSource,
-      isDragging,
-      ...other
-    } = this.props
+      isDragging
+    } = this.state
     let tags = Object.keys(TagTypes).map(type => TagTypes[type])
     
     return (
-      <div {...other}>
+      <div>
         {
           tags.map(type => (
             <Tag 
               key={type}
               type={type}
               isHighlighted={isDragging}
+              onDrag={this.handleTagDrag}
+              onDragStart={this.handleTagDragStart}
+              onDragEnd={this.handleTagDragEnd}
             />
           ))
         }

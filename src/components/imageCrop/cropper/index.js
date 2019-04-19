@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 import withStyles from 'react-jss'
 import { SelectionArea } from '../selectionArea';
 import { Tags } from '../tags';
-import { DropTarget } from 'react-dnd';
-import { ItemTypes } from '../../../helpers';
-import { moveArea } from './moveArea';
+import { fixedMoveAreaOffset } from './moveArea';
 import { resizeArea } from './resizeArea';
 
 const styles = {
@@ -35,7 +33,6 @@ const Cropper = ({
   areaWidth,
   areaHeight,
   onRectUpdate,
-  connectDropTarget,
   isOver,
   onFadedSpaceClick,
   onAreaUpdate
@@ -57,13 +54,11 @@ const Cropper = ({
 
   const handleHover = useCallback(
     ({
-      width,
-      height,
       item,
       initClientOffset,
       currentClientOffset
     }) => {
-      let fixedOffset = moveArea({
+      let fixedOffset = fixedMoveAreaOffset({
         width,
         height,
         item,
@@ -74,6 +69,26 @@ const Cropper = ({
       onAreaUpdate({
         top: fixedOffset.top,
         left: fixedOffset.left
+      })
+    }
+  )
+
+  const handleTagDrag = useCallback(
+    ({
+      item,
+      currentClientOffset
+    }) => {
+      resizeArea({
+        areaTop,
+        areaLeft,
+        areaHeight,
+        areaWidth,
+        width,
+        height,
+        imgRef,
+        item,
+        currentClientOffset,
+        onAreaUpdate
       })
     }
   )
@@ -97,7 +112,7 @@ const Cropper = ({
     height
   }
   
-  return connectDropTarget(
+  return (
     <div style={innerImageContainerStyle}>
       <img
         style={imgStyle}
@@ -125,34 +140,14 @@ const Cropper = ({
           width={areaWidth}
           height={areaHeight}
           isDragging={isOver}
+          onTagDrag={handleTagDrag}
         />
       </SelectionArea>
     </div>
   )
 }
 
-const CropperHOC = DropTarget(
-  [
-    ItemTypes.TAG
-  ],
-  {
-    hover: (props, monitor) => {
-      switch (monitor.getItemType()) {
-        case ItemTypes.TAG: {
-          resizeArea(props, monitor)
-        }
-        default:
-          break;
-      }
-    }
-  },
-  (connect, monitor) => ({
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
-  })
-)(Cropper)
-
-const CropperStyled = withStyles(styles)(CropperHOC)
+const CropperStyled = withStyles(styles)(Cropper)
 
 export { CropperStyled as Cropper }
 
