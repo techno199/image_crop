@@ -5,10 +5,15 @@ import withStyles from 'react-jss'
 const styles = {
   root: {
     position: 'fixed',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     top: 0,
     bottom: 0,
     left: 0,
-    right: 0
+    right: 0,
+    background: 'rgba(0, 0, 0, .7)',
+    overflow: 'auto'
   }
 }
 
@@ -30,13 +35,17 @@ class Modal extends Component {
   }
 
   render() {
-    const { classes, children, open } = this.props
-    return (
+    const { 
+      classes, 
+      children, 
+      open 
+    } = this.props
+
+    return open && (
       <div 
         ref={this.backgroundRef}
-        hidden={!open} 
         className={classes.root} 
-        onClick={this.handleOuterClick}
+        onMouseDown={this.handleOuterClick}
       >
         {children}
       </div>
