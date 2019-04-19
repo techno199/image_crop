@@ -21,6 +21,7 @@ export const resizeArea = (props, monitor) => {
     x: currentOffset.x - rect.left,
     y: currentOffset.y - rect.top,
   }
+  console.log(`{x: ${rect.left};y: ${rect.top}}`)
 
   // Move around respecting currenlty selected tag
   switch (tagType) {

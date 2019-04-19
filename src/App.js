@@ -7,34 +7,16 @@ import { DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 class App extends Component {
-  state = {
-    modalOpen: false
-  }
-
-  handleToggleButton = e => {
-    this.setState(oldState => ({
-      modalOpen: !oldState.modalOpen
-    }))
-  }
-
   render() {
-    const { modalOpen } = this.state
-
     return (
       <DragDropContextProvider backend={HTML5Backend}>
         <div className="App">
           <header className="App-header">
-            <Button onClick={this.handleToggleButton}>
-              Toggle modal
-            </Button>
-            <Modal 
-              open={modalOpen}
-              onOuterClick={this.handleToggleButton}
-            >
-              <ImageCrop 
-                title='Выберите фотографию для вашей страницы'
-              />
-            </Modal>
+            <ImageCrop 
+              title='Выберите фотографию'
+              onClose={this.handleToggleButton}
+              onErrorLoadingImage={this.handleErrorLoading}
+            />
           </header>
         </div>
       </DragDropContextProvider>

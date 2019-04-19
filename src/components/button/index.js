@@ -15,6 +15,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     border: 'none',
+    cursor: 'pointer',
     '&:hover': {
       backgroundColor: '#5b88bd'
     },

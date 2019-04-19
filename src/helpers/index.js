@@ -14,6 +14,11 @@ export const TagTypes = {
   SE: 'SE'
 }
 
+export const ErrorTypes = {
+  WRONG_IMAGE_ASPECT_RATIO: 'WRONG_IMAGE_ASPECT_RATIO',
+  IMAGE_TOO_SMALL: 'IMAGE_TOO_SMALL'
+}
+
 /** How many height's can maximum width contain */
 export const MAX_RESIZE_RATIO = 1
 /** How many height's can minimum width contain */
