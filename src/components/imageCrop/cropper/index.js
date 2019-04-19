@@ -146,7 +146,8 @@ Cropper.propTypes = {
   areaLeft: PropTypes.number.isRequired,
   areaWidth: PropTypes.number.isRequired,
   areaHeight: PropTypes.number.isRequired,
-  rect: PropTypes.object,
+  /** Image reference */
+  imgRef: PropTypes.object.isRequired,
   onRectUpdate: PropTypes.func,
   /** Called each time area is updated */
   onAreaUpdate: PropTypes.func.isRequired,
