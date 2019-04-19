@@ -37,7 +37,8 @@ const Cropper = ({
   onRectUpdate,
   connectDropTarget,
   isOver,
-  onFadedSpaceClick
+  onFadedSpaceClick,
+  onAreaUpdate
 }) => {
   // image ref
   const imgRef = useRef(null)
@@ -51,6 +52,26 @@ const Cropper = ({
           x: e.clientX - rect.left,
           y: e.clientY - rect.top
         })
+    }
+  )
+
+  const handleHover = useCallback(
+    ({
+      width,
+      height,
+      item,
+      initClientOffset,
+      currentClientOffset
+    }) => {
+      moveArea({
+        onAreaUpdate,
+        width,
+        height,
+        item,
+        initClientOffset,
+        currentClientOffset,
+        imgRef
+      })
     }
   )
   // Update image ref on every new image
@@ -95,6 +116,7 @@ const Cropper = ({
         imgWidth={width}
         imgHeight={height}
         src={imgSrc}
+        onHover={handleHover}
       >
         <Tags 
           width={areaWidth}
@@ -113,11 +135,7 @@ const CropperHOC = DropTarget(
   ],
   {
     hover: (props, monitor) => {
-      if (!props.imgRef) return
       switch (monitor.getItemType()) {
-        case ItemTypes.BOX:
-            moveArea(props, monitor)
-          break;
         case ItemTypes.TAG: {
           resizeArea(props, monitor)
         }

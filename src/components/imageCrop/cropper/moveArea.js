@@ -1,16 +1,24 @@
 /** Describes the rules for area movement */
-export const moveArea = (props, monitor) => {
+export const moveArea = ({
+  onAreaUpdate,
+  width,
+  height,
+  item,
+  initClientOffset,
+  currentClientOffset,
+  imgRef
+}) => {
   // Get container data
-  let containerRect = props.imgRef.current.getBoundingClientRect()
+  let containerRect = imgRef.current.getBoundingClientRect()
   /** Inintial area rect */
-  let areaRect = monitor.getItem()
+  let areaRect = item
   // Container dimensions
-  let containerWidth = props.width
-  let containerHeight = props.height
+  let containerWidth = width
+  let containerHeight = height
   /** Initial cursor location */
-  let initOffset = monitor.getInitialClientOffset()
+  let initOffset = initClientOffset
   /** Current offset */
-  let currentOffset = monitor.getClientOffset()
+  let currentOffset = currentClientOffset
   /** Cursor absolute offset */
   let cursorAbsoluteOffset = {
     x: currentOffset.x - containerRect.left,
@@ -36,7 +44,7 @@ export const moveArea = (props, monitor) => {
   else if (areaAbsoluteOffset.bottom > containerHeight)
     fixedAreaTopOffset = containerHeight - areaRect.height
   // Move actual area
-  props.onAreaUpdate({
+  onAreaUpdate({
     top: fixedAreaTopOffset,
     left: fixedAreaLeftOffset
   })
