@@ -1,3 +1,5 @@
+import movePreviewImage from '../img/empty.svg'
+
 export const ItemTypes = {
   BOX: 'BOX',
   TAG: 'TAG'
@@ -29,3 +31,6 @@ export const MAX_IMAGE_DIMENSION_LENGHT = 604
 export const MIN_IMAGE_DIMENSION_LENGHT = 200
 /** Minimum crop area width or height */
 export const MIN_IMAGE_CROP_DIMENSION_LENGHT = 100
+
+export const movePreview = new Image()
+movePreview.src = movePreviewImage
