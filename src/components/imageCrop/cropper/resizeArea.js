@@ -9,9 +9,10 @@ export const resizeArea = (props, monitor) => {
     width,
     onAreaUpdate,
     height,
-    rect
+    imgRef
   } = props
 
+  let rect = imgRef.current.getBoundingClientRect()
   /** Currently dragged tag type */
   let tagType = monitor.getItem().type
   /** Current offset */

@@ -30,7 +30,7 @@ class ImageCrop extends Component {
     /** Current rotation level */
     imgRotationDegree: 0,
     /** Image rectangle */
-    imgRect: null,
+    imgRef: React.createRef(),
     /** Calculated width */
     resizedImageWidth: null,
     /** Calculated height */
@@ -44,7 +44,6 @@ class ImageCrop extends Component {
   }
   // Component refs
   fileInputRef = React.createRef()
-  imgRef = React.createRef()
   // Other props
   reader = new FileReader()
   image = new Image()
@@ -192,10 +191,10 @@ class ImageCrop extends Component {
     })
   }
   
-  /** Update image rectangle */
-  handleCropperRectUpdate = rect => {
+  /** Update image reference */
+  handleCropperRectUpdate = ref => {
     this.setState({
-      imgRect: rect
+      imgRef: ref
     })
   }
 
@@ -212,19 +211,19 @@ class ImageCrop extends Component {
       area,
       resizedImageHeight,
       resizedImageWidth,
-      imgRect
+      imgRef
     } = this.state
 
     // Next code block ensures that image is being rotated 
     // and, if it is, adjusts margin of wrapper
     let imgWidthHeightDelta = 0
-    if (this.imgRef.current) {
+    if (imgRef.current) {
       let isRotated = Boolean((imgRotationDegree / 90) % 2)
       
       if (isRotated) {
         imgWidthHeightDelta = Math.abs(
-          this.imgRef.current.clientWidth - 
-          this.imgRef.current.clientHeight
+          imgRef.current.clientWidth - 
+          imgRef.current.clientHeight
         )
       }
     }
@@ -234,7 +233,6 @@ class ImageCrop extends Component {
       width: resizedImageWidth,
       height: resizedImageHeight
     }
-
     return (
       <Paper className={classes.root}>
         <div className={classes.title}>
@@ -264,9 +262,9 @@ class ImageCrop extends Component {
                   areaHeight={area.height}
                   areaWidth={area.width}
                   imgSrc={imgSrc}
+                  imgRef={imgRef}
                   rotationDegree={imgRotationDegree}
                   onRectUpdate={this.handleCropperRectUpdate}
-                  rect={imgRect}
                   onAreaUpdate={this.updateArea}
                   onFadedSpaceClick={this.handleFadedSpaceClick}
                 />
