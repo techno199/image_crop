@@ -1,6 +1,5 @@
-/** Describes the rules for area movement */
+/** Get fixed allowed offset */
 export const moveArea = ({
-  onAreaUpdate,
   width,
   height,
   item,
@@ -44,8 +43,8 @@ export const moveArea = ({
   else if (areaAbsoluteOffset.bottom > containerHeight)
     fixedAreaTopOffset = containerHeight - areaRect.height
   // Move actual area
-  onAreaUpdate({
+  return {
     top: fixedAreaTopOffset,
     left: fixedAreaLeftOffset
-  })
+  }
 }

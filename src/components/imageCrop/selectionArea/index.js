@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import withStyles from 'react-jss'
-import { ItemTypes } from '../../../helpers';
+import { ItemTypes, movePreview } from '../../../helpers';
 import { DragSource } from 'react-dnd';
-import { getEmptyImage } from 'react-dnd-html5-backend';
 import classNames from 'classnames'
-import update from 'immutability-helper'
-import { moveArea } from '../cropper/moveArea';
 
 const styles = {
   root: {
@@ -61,7 +58,6 @@ class SelectionArea extends Component {
   }
 
   state = getDefaultState()
-
   areaRef = React.createRef()
 
   handleDrag = e => {
@@ -73,6 +69,12 @@ class SelectionArea extends Component {
       x: e.clientX,
       y: e.clientY
     }
+    // If droped outside droppable zone, it returns {0, 0} at last tick
+    // so we ignore it
+    if (
+      currentClientOffset.x === 0 &&
+      currentClientOffset.y === 0
+    ) return
 
     this.props.onHover &&
       this.props.onHover({
@@ -86,6 +88,8 @@ class SelectionArea extends Component {
 
   handleDragStart = e => {
     let rect = this.areaRef.current.getBoundingClientRect()
+    // Set crosshair image on while moving
+    e.dataTransfer.setDragImage(movePreview, 0, 0)
 
     let item = {
       top: rect.top,
@@ -142,9 +146,7 @@ class SelectionArea extends Component {
       marginLeft: -left,
     }
 
-    connectDragPreview(getEmptyImage())
-
-    return connectDragSource(
+    return (
       <div 
         style={areaStyles}
         className={classNames([classes.root, className])}
@@ -166,27 +168,6 @@ class SelectionArea extends Component {
   }
 }
 
-const SelectionAreaHOC = DragSource(
-  ItemTypes.BOX,
-  {
-    beginDrag: (props, monitor, component) => {
-      let rect = component.areaRef.current.getBoundingClientRect()
-      return {
-        top: rect.top,
-        right: rect.right,
-        left: rect.left,
-        bottom: rect.bottom,
-        width: props.width,
-        height: props.height
-      }
-    }
-  },
-  (connect, monitor) => ({
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview()
-  })
-)(SelectionArea)
-
-const SelectionAreaStyled = withStyles(styles)(SelectionAreaHOC)
+const SelectionAreaStyled = withStyles(styles)(SelectionArea)
 
 export { SelectionAreaStyled as SelectionArea }

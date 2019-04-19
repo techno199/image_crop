@@ -63,14 +63,17 @@ const Cropper = ({
       initClientOffset,
       currentClientOffset
     }) => {
-      moveArea({
-        onAreaUpdate,
+      let fixedOffset = moveArea({
         width,
         height,
         item,
         initClientOffset,
         currentClientOffset,
         imgRef
+      })
+      onAreaUpdate({
+        top: fixedOffset.top,
+        left: fixedOffset.left
       })
     }
   )
@@ -130,7 +133,6 @@ const Cropper = ({
 
 const CropperHOC = DropTarget(
   [
-    ItemTypes.BOX,
     ItemTypes.TAG
   ],
   {
