@@ -12,6 +12,27 @@ import { Cropper } from './cropper';
 import update from 'immutability-helper'
 import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT, ErrorTypes } from '../../helpers';
 
+const getDefaultState = () => ({
+  /** Defines whether image was loaded and processed */
+  isImgSelected: false,
+  /** Reference to image DOM */
+  imgSrc: null,
+  /** Current rotation level */
+  imgRotationDegree: 0,
+  /** Image rectangle */
+  imgRef: React.createRef(),
+  /** Calculated width */
+  resizedImageWidth: null,
+  /** Calculated height */
+  resizedImageHeight: null,
+  area: {
+    top: 0,
+    left: 0,
+    width: MIN_IMAGE_DIMENSION_LENGHT,
+    height: MIN_IMAGE_DIMENSION_LENGHT,
+  }
+})
+
 class ImageCrop extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
@@ -22,26 +43,7 @@ class ImageCrop extends Component {
     onErrorLoadingImage: PropTypes.func
   }
 
-  state = {
-    /** Defines whether image was loaded and processed */
-    isImgSelected: false,
-    /** Reference to image DOM */
-    imgSrc: null,
-    /** Current rotation level */
-    imgRotationDegree: 0,
-    /** Image rectangle */
-    imgRef: React.createRef(),
-    /** Calculated width */
-    resizedImageWidth: null,
-    /** Calculated height */
-    resizedImageHeight: null,
-    area: {
-      top: 0,
-      left: 0,
-      width: MIN_IMAGE_DIMENSION_LENGHT,
-      height: MIN_IMAGE_DIMENSION_LENGHT,
-    }
-  }
+  state = getDefaultState()
   // Component refs
   fileInputRef = React.createRef()
   // Other props
@@ -118,8 +120,9 @@ class ImageCrop extends Component {
 
   /** Resets selected image */
   handleGoBackClick = () => {
+    let defaultState = getDefaultState()
     this.setState({
-      isImgSelected: false
+      ...defaultState
     })
   }
 

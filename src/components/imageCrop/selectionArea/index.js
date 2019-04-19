@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import withStyles from 'react-jss'
-import { ItemTypes } from '../../../helpers';
+import { ItemTypes, movePreview } from '../../../helpers';
 import { DragSource } from 'react-dnd';
-import { getEmptyImage } from 'react-dnd-html5-backend';
 import classNames from 'classnames'
 
 const styles = {
@@ -20,6 +19,21 @@ const styles = {
     bottom: 0
   }
 }
+
+const getDefaultState = () => ({
+  initClientOffset: {
+    x: null,
+    y: null
+  },
+  item: {
+    top: null,
+    right: null,
+    bottom: null,
+    left: null,
+    height: null,
+    width: null
+  }
+})
 
 class SelectionArea extends Component {
   static propTypes = {
@@ -39,10 +53,68 @@ class SelectionArea extends Component {
     /** Image width */
     imgWidth: PropTypes.number.isRequired,
     /** Image height */
-    imgHeight: PropTypes.number.isRequired
+    imgHeight: PropTypes.number.isRequired,
+    onHover: PropTypes.func
   }
 
+  state = getDefaultState()
   areaRef = React.createRef()
+
+  handleDrag = e => {
+    const { 
+      imgWidth,
+      imgHeight
+    } = this.props
+    const currentClientOffset = {
+      x: e.clientX,
+      y: e.clientY
+    }
+    // If droped outside droppable zone, it returns {0, 0} at last tick
+    // so we ignore it
+    if (
+      currentClientOffset.x === 0 &&
+      currentClientOffset.y === 0
+    ) return
+
+    this.props.onHover &&
+      this.props.onHover({
+        initClientOffset: this.state.initClientOffset,
+        currentClientOffset,
+        item: this.state.item,
+        width: imgWidth,
+        height: imgHeight
+      })
+  }
+
+  handleDragStart = e => {
+    let rect = this.areaRef.current.getBoundingClientRect()
+    // Set crosshair image on while moving
+    e.dataTransfer.setDragImage(movePreview, 0, 0)
+
+    let item = {
+      top: rect.top,
+      right: rect.right,
+      left: rect.left,
+      bottom: rect.bottom,
+      width: this.props.width,
+      height: this.props.height
+    }
+    
+
+    this.setState({
+      initClientOffset: {
+        x: e.clientX,
+        y: e.clientY
+      },
+      item
+    })
+  }
+
+  handleDragEnd = e => {
+    this.setState({ 
+      ...getDefaultState()
+    })
+  }
 
   render() {
     const { 
@@ -57,6 +129,7 @@ class SelectionArea extends Component {
       src,
       imgWidth,
       imgHeight,
+      onHover,
       ...other
      } = this.props
 
@@ -73,9 +146,7 @@ class SelectionArea extends Component {
       marginLeft: -left,
     }
 
-    connectDragPreview(getEmptyImage())
-
-    return connectDragSource(
+    return (
       <div 
         style={areaStyles}
         className={classNames([classes.root, className])}
@@ -86,6 +157,9 @@ class SelectionArea extends Component {
           <img 
             style={imgStyles}
             src={src}
+            onDrag={this.handleDrag}
+            onDragStart={this.handleDragStart}
+            onDragEnd={this.handleDragEnd}
           />
         </div>
         {this.props.children}
@@ -94,27 +168,6 @@ class SelectionArea extends Component {
   }
 }
 
-const SelectionAreaHOC = DragSource(
-  ItemTypes.BOX,
-  {
-    beginDrag: (props, monitor, component) => {
-      let rect = component.areaRef.current.getBoundingClientRect()
-      return {
-        top: rect.top,
-        right: rect.right,
-        left: rect.left,
-        bottom: rect.bottom,
-        width: props.width,
-        height: props.height
-      }
-    }
-  },
-  (connect, monitor) => ({
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview()
-  })
-)(SelectionArea)
-
-const SelectionAreaStyled = withStyles(styles)(SelectionAreaHOC)
+const SelectionAreaStyled = withStyles(styles)(SelectionArea)
 
 export { SelectionAreaStyled as SelectionArea }
