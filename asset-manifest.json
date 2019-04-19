@@ -1,0 +1,15 @@
+{
+  "main.css": "/image-cropper/static/css/main.cc41a1bd.chunk.css",
+  "main.js": "/image-cropper/static/js/main.039f9f33.chunk.js",
+  "main.js.map": "/image-cropper/static/js/main.039f9f33.chunk.js.map",
+  "runtime~main.js": "/image-cropper/static/js/runtime~main.f907d18a.js",
+  "runtime~main.js.map": "/image-cropper/static/js/runtime~main.f907d18a.js.map",
+  "static/js/2.9ac5901d.chunk.js": "/image-cropper/static/js/2.9ac5901d.chunk.js",
+  "static/js/2.9ac5901d.chunk.js.map": "/image-cropper/static/js/2.9ac5901d.chunk.js.map",
+  "index.html": "/image-cropper/index.html",
+  "precache-manifest.cad1cd50267aab4e62009441957d8fe4.js": "/image-cropper/precache-manifest.cad1cd50267aab4e62009441957d8fe4.js",
+  "service-worker.js": "/image-cropper/service-worker.js",
+  "static/css/main.cc41a1bd.chunk.css.map": "/image-cropper/static/css/main.cc41a1bd.chunk.css.map",
+  "static/media/rotate_left.92a114e8.svg": "/image-cropper/static/media/rotate_left.92a114e8.svg",
+  "static/media/rotate_right.bd9c45d6.svg": "/image-cropper/static/media/rotate_right.bd9c45d6.svg"
+}
