@@ -10,7 +10,7 @@ import { Button } from '../button';
 import styles from './imageCrop.styles'
 import { Cropper } from './cropper';
 import update from 'immutability-helper'
-import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT, ErrorTypes } from '../../helpers';
+import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT, ErrorTypes, MAX_RESIZE_RATIO, MIN_RESIZE_RATIO, FULL_IMAGE_SELECTION_THRESHOLD } from '../../helpers';
 
 const getDefaultState = () => ({
   /** Defines whether image was loaded and processed */
@@ -96,13 +96,28 @@ class ImageCrop extends Component {
       // Set default image center
       let initialAreaTop = resizedImageHeight / 2 - MIN_IMAGE_DIMENSION_LENGHT / 2
       let initialAreaLeft = resizedImageWidth / 2 - MIN_IMAGE_DIMENSION_LENGHT / 2
+      let calculatedWidth = Math.min(MIN_IMAGE_DIMENSION_LENGHT, resizedImageWidth)
+      let calculatedHeight = Math.min(MIN_IMAGE_DIMENSION_LENGHT, resizedImageHeight)
+
+      // Select entire image if it is small enough
+      if (
+        resizedImageHeight / resizedImageWidth <= MAX_RESIZE_RATIO &&
+        resizedImageHeight / resizedImageWidth >= MIN_RESIZE_RATIO &&
+        resizedImageHeight <= MAX_IMAGE_DIMENSION_LENGHT &&
+        resizedImageWidth <= FULL_IMAGE_SELECTION_THRESHOLD
+      ) {
+        initialAreaTop = 0
+        initialAreaLeft = 0
+        calculatedWidth = resizedImageWidth
+        calculatedHeight = resizedImageHeight
+      }
 
       this.setState({
         area: update(this.state.area, {
           top: { $set: initialAreaTop },
           left: { $set: initialAreaLeft },
-          width: { $set: Math.min(MIN_IMAGE_DIMENSION_LENGHT, resizedImageWidth) },
-          height: { $set: Math.min(MIN_IMAGE_DIMENSION_LENGHT, resizedImageHeight) }
+          width: { $set: calculatedWidth },
+          height: { $set: calculatedHeight }
         }),
         resizedImageWidth,
         resizedImageHeight,
