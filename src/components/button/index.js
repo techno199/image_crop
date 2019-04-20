@@ -16,6 +16,7 @@ const styles = {
     justifyContent: 'center',
     border: 'none',
     cursor: 'pointer',
+    userSelect: 'none',
     '&:hover': {
       backgroundColor: '#5b88bd'
     },

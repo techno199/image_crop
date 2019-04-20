@@ -123,28 +123,8 @@ class Tag extends Component {
     }
   }
 
-  handleDrag = e => {
-    const currentClientOffset = {
-      x: e.clientX,
-      y: e.clientY
-    }
-    // It returns {0, 0} at last tick
-    // so we ignore it
-    if (
-      currentClientOffset.x === 0 &&
-      currentClientOffset.y === 0
-    ) return
-
-    this.props.onDrag &&
-      this.props.onDrag({
-        initClientOffset: this.state.initClientOffset,
-        currentClientOffset,
-        item: this.state.item
-      })
-  }
-
-  handleDragStart = e => {
-    e.dataTransfer.setDragImage(movePreview, 0, 0)
+  handleMouseDown = e => {
+    e.preventDefault()
     let item = {
       type: this.props.type
     }
@@ -157,11 +137,30 @@ class Tag extends Component {
     })
     this.props.onDragStart &&
       this.props.onDragStart(e)
+
+    document.addEventListener('mousemove', this._onMouseMove)
+    document.addEventListener('mouseup', this._onMouseUp)
   }
 
-  handleDragEnd = e => {
+  _onMouseUp = e => {
+    document.removeEventListener('mousemove', this._onMouseMove)
+    document.removeEventListener('mouseup', this._onMouseUp)
     this.props.onDragEnd &&
       this.props.onDragEnd(e)
+  }
+
+  _onMouseMove = e => {
+    const currentClientOffset = {
+      x: e.clientX,
+      y: e.clientY
+    }
+
+    this.props.onDrag &&
+      this.props.onDrag({
+        initClientOffset: this.state.initClientOffset,
+        currentClientOffset,
+        item: this.state.item
+      })
   }
 
   render() {
@@ -180,9 +179,9 @@ class Tag extends Component {
       <div
         className={classNames([classes.root, this.state.tagName])}
         style={hightlightStyle}
-        onDrag={this.handleDrag}
-        onDragStart={this.handleDragStart}
-        onDragEnd={this.handleDragEnd}
+        draggable={false}
+        onMouseDown={this.handleMouseDown}
+        onMouseUp={this.handleMouseUp}
       />
     )
   }

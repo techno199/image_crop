@@ -120,10 +120,12 @@ const Cropper = ({
         src={imgSrc}
         ref={imgRef} 
         alt='Preview' 
+        draggable={false}
       />
       <div 
         className={classes.imgFade} 
         onClick={handleFadeClick}
+        draggable={false}
       />
       <SelectionArea
         className={classes.area}
