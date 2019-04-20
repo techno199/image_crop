@@ -16,19 +16,17 @@ class Tags extends Component {
     /** Selected area height */
     height: PropTypes.number.isRequired,
     /** Tag dragging callback */
-    onTagDrag: PropTypes.func
+    onTagDrag: PropTypes.func,
+    onTagDragStart: PropTypes.func,
+    onTagDragEnd: PropTypes.func
   }
 
-  state = {
-    isDragging: false
-  }
-
-  shouldComponentUpdate = (nextProps, nextState) => {
+  shouldComponentUpdate = nextProps => {
     // Huge performance improvement
     if (
       this.props.width === nextProps.width &&
       this.props.height === nextProps.height &&
-      this.state.isDragging === nextState.isDragging
+      this.props.isDragging === nextProps.isDragging
     ) return false
     return true
   }
@@ -38,22 +36,20 @@ class Tags extends Component {
       this.props.onTagDrag(e)
   }
 
-  handleTagDragEnd = e => {
-    this.setState({
-      isDragging: false
-    })
+  handleTagDragEnd = () => {
+    this.props.onTagDragEnd &&
+      this.props.onTagDragEnd()
   }
 
-  handleTagDragStart = e => {
-    this.setState({
-      isDragging: true
-    })
+  handleTagDragStart = () => {
+    this.props.onTagDragStart &&
+      this.props.onTagDragStart()
   }
 
   render() {
     const { 
       isDragging
-    } = this.state
+    } = this.props
     let tags = Object.keys(TagTypes).map(type => TagTypes[type])
     
     return (
