@@ -22,10 +22,33 @@ export const resizeArea = ({
     x: currentOffset.x - rect.left,
     y: currentOffset.y - rect.top,
   }
-
-  // Move around respecting currenlty selected tag
+  // Fix tagType depending on current location
+  if (TagTypes.isEdge(tagType))
+    tagType = TagTypes.getCurrentEdge(
+      tagType,
+      areaTop,
+      areaLeft,
+      areaWidth,
+      areaHeight,
+      cursorAbsoluteOffset.x,
+      cursorAbsoluteOffset.y
+    )
+  else if (TagTypes.isPole(tagType))
+    tagType = TagTypes.getCurrentPole(
+      areaTop,
+      areaHeight,
+      cursorAbsoluteOffset.y
+    )
+  else 
+    tagType = TagTypes.getCurrentSide(
+      areaLeft,
+      areaWidth,
+      cursorAbsoluteOffset.x
+    )
+  
+  // Move around with respect to actually selected tag
   switch (tagType) {
-    case TagTypes.NW: {
+    case TagTypes.types.NW: {
       onAreaUpdate({
         top: areaTop - getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset),
         left: areaLeft - getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
@@ -34,14 +57,14 @@ export const resizeArea = ({
       })
       break
     }      
-    case TagTypes.N: {
+    case TagTypes.types.N: {
       onAreaUpdate({
         top: areaTop - getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset),
         height: areaHeight + getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset)
       })
       break
     }
-    case TagTypes.NE: {
+    case TagTypes.types.NE: {
       onAreaUpdate({
         top: areaTop - getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset),
         width: areaWidth - getFixedRightDelta(width, areaLeft, areaHeight, areaWidth, cursorAbsoluteOffset),
@@ -49,26 +72,26 @@ export const resizeArea = ({
       })
       break
     }
-    case TagTypes.E: {
+    case TagTypes.types.E: {
       onAreaUpdate({
         width: areaWidth - getFixedRightDelta(width, areaLeft, areaHeight, areaWidth, cursorAbsoluteOffset)
       })
       break
     }
-    case TagTypes.SE: {
+    case TagTypes.types.SE: {
       onAreaUpdate({
         width: areaWidth - getFixedRightDelta(width, areaLeft, areaHeight, areaWidth, cursorAbsoluteOffset),
         height: areaHeight - getFixedBottomDelta(height, areaTop, areaWidth, areaHeight, cursorAbsoluteOffset)
       })
       break
     }
-    case TagTypes.S: {
+    case TagTypes.types.S: {
       onAreaUpdate({
         height: areaHeight - getFixedBottomDelta(height, areaTop, areaWidth, areaHeight, cursorAbsoluteOffset)
       })
       break
     }
-    case TagTypes.SW: {
+    case TagTypes.types.SW: {
       onAreaUpdate({
         left: areaLeft - getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
         height: areaHeight - getFixedBottomDelta(height, areaTop, areaWidth, areaHeight, cursorAbsoluteOffset),
@@ -76,7 +99,7 @@ export const resizeArea = ({
       })
       break
     }
-    case TagTypes.W: {
+    case TagTypes.types.W: {
       onAreaUpdate({
         left: areaLeft - getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
         width: areaWidth + getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset)

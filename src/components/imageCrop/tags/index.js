@@ -50,8 +50,8 @@ class Tags extends Component {
     const { 
       isDragging
     } = this.props
-    let tags = Object.keys(TagTypes).map(type => TagTypes[type])
-    
+    let tags = Object.keys(TagTypes.types).map(type => TagTypes.types[type])
+  
     return (
       <div>
         {
