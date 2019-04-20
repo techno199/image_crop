@@ -40,8 +40,8 @@ export const fixedMoveAreaOffset = ({
   let fixedAreaTopOffset = areaAbsoluteOffset.top
   if (areaAbsoluteOffset.top < 0)
     fixedAreaTopOffset = 0
-  else if (areaAbsoluteOffset.bottom > containerHeight)
-    fixedAreaTopOffset = containerHeight - areaRect.height + 1
+  else if (areaAbsoluteOffset.bottom > containerHeight + 1)
+    fixedAreaTopOffset = containerHeight - areaRect.height
   // Move actual area
   return {
     top: fixedAreaTopOffset,
