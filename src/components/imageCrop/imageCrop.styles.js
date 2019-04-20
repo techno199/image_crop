@@ -17,7 +17,8 @@ export default {
   descriptionWrap: {
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: 35
+    marginBottom: 35,
+    userSelect: 'none'
   },
   cropWrap: {
     padding: '32px 20px 20px',

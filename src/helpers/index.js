@@ -21,9 +21,9 @@ export const ErrorTypes = {
   IMAGE_TOO_SMALL: 'IMAGE_TOO_SMALL'
 }
 
-/** How many height's can maximum width contain */
+/** MaxPossibleWidth/currentHegiht */
 export const MAX_RESIZE_RATIO = 1
-/** How many height's can minimum width contain */
+/** MinPossibleWidth/currentHeight */
 export const MIN_RESIZE_RATIO = 1/1.5
 /** Maximum image markup width or height */
 export const MAX_IMAGE_DIMENSION_LENGHT = 604
@@ -31,6 +31,8 @@ export const MAX_IMAGE_DIMENSION_LENGHT = 604
 export const MIN_IMAGE_DIMENSION_LENGHT = 200
 /** Minimum crop area width or height */
 export const MIN_IMAGE_CROP_DIMENSION_LENGHT = 100
+/** If given image width is less than this value, we select an entire image on load */
+export const FULL_IMAGE_SELECTION_THRESHOLD = 300
 
 export const movePreview = new Image()
 movePreview.src = movePreviewImage
