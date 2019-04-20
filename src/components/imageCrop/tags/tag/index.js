@@ -123,19 +123,6 @@ class Tag extends Component {
     }
   }
 
-  handleDrag = e => {
-  }
-
-  handleDragStart = e => {
-    e.dataTransfer.setDragImage(movePreview, 0, 0)
-    
-  }
-
-  handleDragEnd = e => {
-    this.props.onDragEnd &&
-      this.props.onDragEnd(e)
-  }
-
   handleMouseDown = e => {
     let item = {
       type: this.props.type

@@ -256,6 +256,7 @@ class ImageCrop extends Component {
               <div 
                 className={classes.outerImage}
                 style={outerImageContainerStyle}
+                draggable={false}
               >
                 <Cropper
                   height={resizedImageHeight}
@@ -271,7 +272,7 @@ class ImageCrop extends Component {
                   onAreaUpdate={this.updateArea}
                   onFadedSpaceClick={this.handleFadedSpaceClick}
                 />
-                <div className={classes.rotationButtons}>
+                <div className={classes.rotationButtons} draggable={false}>
                   <RotateAntiClockwiseIcon
                     className={classes.rotateClockwise}
                     onClick={this.handleRotateClick(-90)}

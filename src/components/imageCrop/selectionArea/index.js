@@ -60,30 +60,9 @@ class SelectionArea extends Component {
   state = getDefaultState()
   areaRef = React.createRef()
 
-  handleDrag = e => {
-    const currentClientOffset = {
-      x: e.clientX,
-      y: e.clientY
-    }
-    // If droped outside droppable zone, it returns {0, 0} at last tick
-    // so we ignore it
-    if (
-      currentClientOffset.x === 0 &&
-      currentClientOffset.y === 0
-    ) return
-
-    this.props.onHover &&
-      this.props.onHover({
-        initClientOffset: this.state.initClientOffset,
-        currentClientOffset,
-        item: this.state.item
-      })
-  }
-
-  handleDragStart = e => {
+  handleMouseDown = e => {
+    e.preventDefault()
     let rect = this.areaRef.current.getBoundingClientRect()
-    // Set crosshair image on while moving
-    e.dataTransfer.setDragImage(movePreview, 0, 0)
 
     let item = {
       top: rect.top,
@@ -102,12 +81,28 @@ class SelectionArea extends Component {
       },
       item
     })
+
+    document.addEventListener('mousemove', this._onMouseMove)
+    document.addEventListener('mouseup', this._onMouseUp)
   }
 
-  handleDragEnd = e => {
-    this.setState({ 
-      ...getDefaultState()
-    })
+  _onMouseMove = e => {
+    const currentClientOffset = {
+      x: e.clientX,
+      y: e.clientY
+    }
+
+    this.props.onHover &&
+      this.props.onHover({
+        initClientOffset: this.state.initClientOffset,
+        currentClientOffset,
+        item: this.state.item
+      })
+  }
+
+  _onMouseUp = e => {
+    document.removeEventListener('mousemove', this._onMouseMove)
+    document.removeEventListener('mouseup', this._onMouseUp)
   }
 
   render() {
@@ -145,15 +140,15 @@ class SelectionArea extends Component {
         style={areaStyles}
         className={classNames([classes.root, className])}
         ref={this.areaRef}
+        draggable={false}
         {...other}
       >
         <div className={classes.imgWrap}>
           <img 
             style={imgStyles}
             src={src}
-            onDrag={this.handleDrag}
-            onDragStart={this.handleDragStart}
-            onDragEnd={this.handleDragEnd}
+            draggable={false}
+            onMouseDown={this.handleMouseDown}
             alt=''
           />
         </div>
