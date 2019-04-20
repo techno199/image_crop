@@ -124,6 +124,7 @@ class Tag extends Component {
   }
 
   handleMouseDown = e => {
+    e.preventDefault()
     let item = {
       type: this.props.type
     }
