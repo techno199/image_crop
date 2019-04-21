@@ -10,7 +10,7 @@ import { Button } from '../button';
 import styles from './imageCrop.styles'
 import { Cropper } from './cropper';
 import update from 'immutability-helper'
-import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT, ErrorTypes, MAX_RESIZE_RATIO, MIN_RESIZE_RATIO, FULL_IMAGE_SELECTION_THRESHOLD } from '../../helpers';
+import { MAX_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_DIMENSION_LENGHT, MIN_IMAGE_CROP_DIMENSION_LENGHT, ErrorTypes, MAX_RESIZE_RATIO, MIN_RESIZE_RATIO, FULL_IMAGE_SELECTION_THRESHOLD, TagTypes } from '../../helpers';
 
 const getDefaultState = () => ({
   /** Defines whether image was loaded and processed */
@@ -216,6 +216,82 @@ class ImageCrop extends Component {
     })
   }
 
+  /** Fires each tick of area drawing */
+  handleDrawArea = ({ initClientX, initClientY, clientX, clientY })=> {
+    let top, left, width, height
+    if (clientX > initClientX)
+      if (clientY > initClientY) {
+        // SE
+        top = initClientY
+        left = initClientX
+        width = clientX - initClientX
+        height = clientY - initClientY
+      }
+      else {
+        // NE
+        top = clientY
+        left = initClientX
+        width = clientX - initClientX
+        height = initClientY - clientY
+      }
+    else
+      if (clientY > initClientY) {
+        // SW
+        top = initClientY
+        left = clientX
+        width = initClientX - clientX
+        height = clientY - initClientY
+      }
+      else {
+        // NW
+        top = clientY
+        left = clientX
+        width = initClientX - clientX
+        height = initClientY - clientY
+      }
+    this.updateArea({
+      top,
+      left,
+      width,
+      height
+    })
+  }
+
+  handleDrawAreaEnd = e => {
+    const { 
+      resizedImageWidth,
+      resizedImageHeight,
+      area
+    } = this.state
+    let left = area.left
+    let top = area.top
+    let height = area.height
+    let width = area.width
+    let desiredHeight = Math.max(height, MIN_IMAGE_CROP_DIMENSION_LENGHT)
+    // Width we can afford
+    let desiredWidth = Math.min(
+      resizedImageWidth, 
+      Math.min(
+          desiredHeight * MAX_RESIZE_RATIO,
+          Math.max(
+            width,
+            MIN_IMAGE_CROP_DIMENSION_LENGHT
+          )
+        )
+    )
+    // Keep area inside
+    if (left + desiredWidth > resizedImageWidth)
+      left = resizedImageWidth - desiredWidth
+    if (top + desiredHeight > resizedImageHeight)
+      top = resizedImageHeight - desiredHeight
+    this.updateArea({
+      top,
+      left,
+      width: desiredWidth,
+      height: desiredHeight
+    })
+  }
+
   render() {
     const { 
       classes,
@@ -286,6 +362,8 @@ class ImageCrop extends Component {
                   onRectUpdate={this.handleCropperRectUpdate}
                   onAreaUpdate={this.updateArea}
                   onFadedSpaceClick={this.handleFadedSpaceClick}
+                  onDrawArea={this.handleDrawArea}
+                  onDrawAreaEnd={this.handleDrawAreaEnd}
                 />
                 <div className={classes.rotationButtons} draggable={false}>
                   <RotateAntiClockwiseIcon
