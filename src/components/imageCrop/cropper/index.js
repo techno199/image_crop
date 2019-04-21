@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useEffect, useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import withStyles from 'react-jss'
 import { SelectionArea } from '../selectionArea';
-import { Tags } from '../tags';
+import update from 'immutability-helper'
 import { fixedMoveAreaOffset } from './moveArea';
 import { resizeArea } from './resizeArea';
 
@@ -34,22 +34,70 @@ const Cropper = ({
   areaHeight,
   onRectUpdate,
   onFadedSpaceClick,
+  onDrawArea,
+  onDrawAreaEnd,
   onAreaUpdate
 }) => {
   // image ref
   const imgRef = useRef(null)
 
-  /**Occurs on faded cropper part clicked */
-  const handleFadeClick = useCallback(
-    (e) => {
-      let rect = imgRef.current.getBoundingClientRect()
-      onFadedSpaceClick &&
-        onFadedSpaceClick({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
-        })
+  const handleMouseDown = e => {
+    e.preventDefault()
+    let drawState = {
+      initClientX: e.clientX,
+      initClientY: e.clientY,
+      isDrawingAllowed: false
     }
-  )
+
+    const _onMouseMove = e => {
+      if (
+        Math.abs(e.clientX - drawState.initClientX) > 4 &&
+        Math.abs(e.clientY - drawState.initClientY) > 4
+      ) 
+        drawState = (update(drawState, { isDrawingAllowed: { $set: true }}))
+      if (drawState.isDrawingAllowed) {
+        let rect = imgRef.current.getBoundingClientRect()
+        // Fix absolute offset to always be inside container
+        let clientX = e.clientX - rect.left
+        let clientY = e.clientY - rect.top
+        if (clientX < 0)
+          clientX = 0
+        else if (clientX > width)
+          clientX = width
+        if (clientY < 0)
+          clientY = 0
+        else if (clientY > height)
+          clientY = height
+        onDrawArea &&
+          onDrawArea({
+            initClientX: drawState.initClientX - rect.left,
+            initClientY: drawState.initClientY - rect.top,
+            clientX,
+            clientY
+          })
+        }
+    }
+
+    const _onMouseUp = e => {
+      document.removeEventListener('mousemove', _onMouseMove)
+      document.removeEventListener('mouseup', _onMouseUp)
+      if (!drawState.isDrawingAllowed) {
+        let rect = imgRef.current.getBoundingClientRect()
+        onFadedSpaceClick &&
+          onFadedSpaceClick({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+          })
+      }
+      else {
+        onDrawAreaEnd &&
+          onDrawAreaEnd(e)
+      }
+    }
+
+    document.addEventListener('mousemove', _onMouseMove)
+    document.addEventListener('mouseup', _onMouseUp)
+  }
 
   const handleHover = useCallback(
     ({
@@ -72,8 +120,7 @@ const Cropper = ({
     }
   )
 
-  const handleTagDrag = useCallback(
-    ({
+  const handleTagDrag = useCallback(({
       item,
       currentClientOffset
     }) => {
@@ -123,7 +170,7 @@ const Cropper = ({
       />
       <div 
         className={classes.imgFade} 
-        onClick={handleFadeClick}
+        onMouseDown={handleMouseDown}
         draggable={false}
       />
       <SelectionArea
@@ -162,5 +209,9 @@ Cropper.propTypes = {
   /** Called each time area is updated */
   onAreaUpdate: PropTypes.func.isRequired,
   /** Called when empty faded point is clicked. Returns {x, y} absolute coordinates */
-  onFadedSpaceClick: PropTypes.func
+  onFadedSpaceClick: PropTypes.func,
+  /** Called during drawing area */
+  onDrawArea: PropTypes.func,
+  /** Called when drawing area is finished */
+  onDrawAreaEnd: PropTypes.func,
 }
