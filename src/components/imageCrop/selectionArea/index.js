@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import withStyles from 'react-jss'
 import { movePreview } from '../../../helpers';
 import classNames from 'classnames'
+import { Tags } from '../tags';
 
 const styles = {
   root: {
@@ -19,21 +20,6 @@ const styles = {
     userSelect: 'none'
   }
 }
-
-const getDefaultState = () => ({
-  initClientOffset: {
-    x: null,
-    y: null
-  },
-  item: {
-    top: null,
-    right: null,
-    bottom: null,
-    left: null,
-    height: null,
-    width: null
-  }
-})
 
 class SelectionArea extends Component {
   static propTypes = {
@@ -54,10 +40,26 @@ class SelectionArea extends Component {
     imgWidth: PropTypes.number.isRequired,
     /** Image height */
     imgHeight: PropTypes.number.isRequired,
-    onHover: PropTypes.func
+    onHover: PropTypes.func,
+    handleTagDrag: PropTypes.func,
   }
 
-  state = getDefaultState()
+  state = {
+    initClientOffset: {
+      x: null,
+      y: null
+    },
+    item: {
+      top: null,
+      right: null,
+      bottom: null,
+      left: null,
+      height: null,
+      width: null
+    },
+    isDragging: false
+  }
+
   areaRef = React.createRef()
 
   handleMouseDown = e => {
@@ -79,7 +81,8 @@ class SelectionArea extends Component {
         x: e.clientX,
         y: e.clientY
       },
-      item
+      item,
+      isDragging: true
     })
 
     document.addEventListener('mousemove', this._onMouseMove)
@@ -103,6 +106,21 @@ class SelectionArea extends Component {
   _onMouseUp = e => {
     document.removeEventListener('mousemove', this._onMouseMove)
     document.removeEventListener('mouseup', this._onMouseUp)
+    this.setState({
+      isDragging: false
+    })
+  }
+
+  handleTagDragStart = () => {
+    this.setState({
+      isDragging: true
+    })
+  }
+
+  handleTagDragEnd = () => {
+    this.setState({
+      isDragging: false
+    })
   }
 
   render() {
@@ -119,8 +137,13 @@ class SelectionArea extends Component {
       imgWidth,
       imgHeight,
       onHover,
+      handleTagDrag,
       ...other
-     } = this.props
+    } = this.props
+
+    const { 
+      isDragging
+     } = this.state
 
     const areaStyles = {
       top,
@@ -152,7 +175,14 @@ class SelectionArea extends Component {
             alt=''
           />
         </div>
-        {this.props.children}
+        <Tags
+          width={width}
+          height={height}
+          isDragging={isDragging}
+          onTagDrag={handleTagDrag}
+          onTagDragStart={this.handleTagDragStart}
+          onTagDragEnd={this.handleTagDragEnd}
+        />
       </div>
     )
   }

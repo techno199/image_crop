@@ -33,7 +33,6 @@ const Cropper = ({
   areaWidth,
   areaHeight,
   onRectUpdate,
-  isOver,
   onFadedSpaceClick,
   onAreaUpdate
 }) => {
@@ -137,14 +136,8 @@ const Cropper = ({
         imgHeight={height}
         src={imgSrc}
         onHover={handleHover}
-      >
-        <Tags 
-          width={areaWidth}
-          height={areaHeight}
-          isDragging={isOver}
-          onTagDrag={handleTagDrag}
-        />
-      </SelectionArea>
+        handleTagDrag={handleTagDrag}
+      />
     </div>
   )
 }
