@@ -272,12 +272,12 @@ class ImageCrop extends Component {
     let desiredWidth = Math.min(
       resizedImageWidth, 
       Math.min(
-          desiredHeight * MAX_RESIZE_RATIO,
-          Math.max(
-            width,
-            MIN_IMAGE_CROP_DIMENSION_LENGHT
-          )
+        desiredHeight * MAX_RESIZE_RATIO,
+        Math.max(
+          width,
+          desiredHeight * MIN_RESIZE_RATIO
         )
+      )
     )
     // Keep area inside
     if (left + desiredWidth > resizedImageWidth)
