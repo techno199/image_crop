@@ -32,8 +32,8 @@ export const TagTypes = {
   getCurrentEdge(currentType, areaTop, areaLeft, areaWidth, areaHeight, clientX, clientY) {
     let areaMiddleX = areaLeft + areaWidth / 2
     let areaMiddleY = areaTop + areaHeight / 2
-    let additionalOffsetX = areaWidth / 4
-    let additionalOffsetY = areaHeight / 4
+    let additionalOffsetX = areaWidth / 3
+    let additionalOffsetY = areaHeight / 3
     // Don't ask W.T.F. is this.
     // We just need this to happened.
     switch (currentType) {
