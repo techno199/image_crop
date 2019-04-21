@@ -49,12 +49,13 @@ export const resizeArea = ({
   // Move around with respect to actually selected tag
   switch (tagType) {
     case TagTypes.types.NW: {
-      onAreaUpdate({
-        top: areaTop - getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset),
-        left: areaLeft - getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
-        width: areaWidth + getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
-        height: areaHeight + getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset)
-      })
+      onAreaUpdate({...getFixedNW(
+        areaTop,
+        areaLeft,
+        areaWidth,
+        areaHeight,
+        cursorAbsoluteOffset
+      )})
       break
     }      
     case TagTypes.types.N: {
@@ -65,11 +66,14 @@ export const resizeArea = ({
       break
     }
     case TagTypes.types.NE: {
-      onAreaUpdate({
-        top: areaTop - getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset),
-        width: areaWidth - getFixedRightDelta(width, areaLeft, areaHeight, areaWidth, cursorAbsoluteOffset),
-        height: areaHeight + getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset)
-      })
+      onAreaUpdate({...getFixedNE(
+        areaTop,
+        areaLeft,
+        areaWidth,
+        areaHeight,
+        width,
+        cursorAbsoluteOffset
+      )})
       break
     }
     case TagTypes.types.E: {
@@ -79,10 +83,15 @@ export const resizeArea = ({
       break
     }
     case TagTypes.types.SE: {
-      onAreaUpdate({
-        width: areaWidth - getFixedRightDelta(width, areaLeft, areaHeight, areaWidth, cursorAbsoluteOffset),
-        height: areaHeight - getFixedBottomDelta(height, areaTop, areaWidth, areaHeight, cursorAbsoluteOffset)
-      })
+      onAreaUpdate({...getFixedSE(
+        areaTop,
+        areaLeft,
+        areaWidth,
+        areaHeight,
+        width,
+        height,
+        cursorAbsoluteOffset
+      )})
       break
     }
     case TagTypes.types.S: {
@@ -92,11 +101,14 @@ export const resizeArea = ({
       break
     }
     case TagTypes.types.SW: {
-      onAreaUpdate({
-        left: areaLeft - getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
-        height: areaHeight - getFixedBottomDelta(height, areaTop, areaWidth, areaHeight, cursorAbsoluteOffset),
-        width: areaWidth + getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset)
-      })
+      onAreaUpdate({...getFixedSW(
+        areaTop,
+        areaLeft,
+        areaWidth,
+        areaHeight,
+        height,
+        cursorAbsoluteOffset
+      )})
       break
     }
     case TagTypes.types.W: {
@@ -193,4 +205,179 @@ const getFixedTopDelta = (areaTop, areaHeight, areaWidth, cursorAbsoluteOffset) 
   else if (cursorAbsoluteOffset.y > topAbsoluteOffsetInterval.min)
     fixedTopOffset = topAbsoluteOffsetInterval.min
   return areaTop - fixedTopOffset
+}
+
+const getFixedNW = (areaTop, areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset) => {
+  let allowedWidth = areaLeft + areaWidth
+  let topAbsoluteOffsetInterval = {
+    max: Math.max(
+      0,
+      areaTop + areaHeight - allowedWidth / MIN_RESIZE_RATIO
+    ),
+    min: Math.min(
+      areaTop + areaHeight - areaWidth / MAX_RESIZE_RATIO,
+      areaTop + areaHeight - MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset based on interval
+  let fixedTopOffset = cursorAbsoluteOffset.y
+  if (cursorAbsoluteOffset.y < topAbsoluteOffsetInterval.max)
+    fixedTopOffset = topAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.y > topAbsoluteOffsetInterval.min)
+    fixedTopOffset = topAbsoluteOffsetInterval.min
+  
+  let allowedHeight = areaTop + areaHeight
+  let leftAbsoluteOffsetInterval = {
+    max: Math.max(
+      0, 
+      areaLeft + areaWidth - Math.ceil(allowedHeight * MAX_RESIZE_RATIO)
+    ),
+    min: Math.min(
+      areaLeft + areaWidth - areaHeight * MIN_RESIZE_RATIO,
+      areaLeft + areaWidth - MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset based on interval
+  let fixedLeftOffset = cursorAbsoluteOffset.x
+  if (cursorAbsoluteOffset.x < leftAbsoluteOffsetInterval.max)
+    fixedLeftOffset = leftAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.x > leftAbsoluteOffsetInterval.min)
+    fixedLeftOffset = leftAbsoluteOffsetInterval.min
+  return {
+    top: fixedTopOffset,
+    left: fixedLeftOffset,
+    width: areaWidth + areaLeft - fixedLeftOffset,
+    height: areaHeight + areaTop - fixedTopOffset
+  }
+}
+
+const getFixedNE = (areaTop, areaLeft, areaWidth, areaHeight, containerWidth, cursorAbsoluteOffset) => {
+  let allowedWidth = containerWidth - areaLeft
+  let topAbsoluteOffsetInterval = {
+    max: Math.max(
+      0,
+      areaTop + areaHeight - allowedWidth / MIN_RESIZE_RATIO
+    ),
+    min: Math.min(
+      areaTop + areaHeight - areaWidth / MAX_RESIZE_RATIO,
+      areaTop + areaHeight - MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset based on interval
+  let fixedTopOffset = cursorAbsoluteOffset.y
+  if (cursorAbsoluteOffset.y < topAbsoluteOffsetInterval.max)
+    fixedTopOffset = topAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.y > topAbsoluteOffsetInterval.min)
+    fixedTopOffset = topAbsoluteOffsetInterval.min
+  
+  let allowedHeight = areaTop + areaHeight
+  let rightAbsoluteOffsetInterval = {
+    max: Math.min(
+      containerWidth, 
+      areaLeft + Math.ceil(allowedHeight * MAX_RESIZE_RATIO)
+    ),
+    min: Math.max(
+      areaLeft + areaHeight * MIN_RESIZE_RATIO,
+      areaLeft + MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset
+  let fixedRightOffset = cursorAbsoluteOffset.x
+  if (cursorAbsoluteOffset.x > rightAbsoluteOffsetInterval.max)
+    fixedRightOffset = rightAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.x < rightAbsoluteOffsetInterval.min)
+    fixedRightOffset = rightAbsoluteOffsetInterval.min
+
+  return {
+    top: fixedTopOffset,
+    width: areaWidth - (areaLeft + areaWidth - fixedRightOffset),
+    height: areaHeight + areaTop - fixedTopOffset
+  }
+}
+
+const getFixedSE = (areaTop, areaLeft, areaWidth, areaHeight, containerWidth, containerHeight, cursorAbsoluteOffset) => {
+  let allowedWidth = containerWidth - areaLeft
+  let bottomAbsoluteOffsetInterval = {
+    max: Math.min(
+      containerHeight,
+      areaTop + allowedWidth / MIN_RESIZE_RATIO
+    ),
+    min: Math.max(
+      areaTop + areaWidth / MAX_RESIZE_RATIO,
+      areaTop + MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset based on interval
+  let fixedBottomOffset = cursorAbsoluteOffset.y
+  if (cursorAbsoluteOffset.y > bottomAbsoluteOffsetInterval.max)
+    fixedBottomOffset = bottomAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.y < bottomAbsoluteOffsetInterval.min)
+    fixedBottomOffset = bottomAbsoluteOffsetInterval.min
+  
+  let allowedHeight = containerHeight - areaTop
+  let rightAbsoluteOffsetInterval = {
+    max: Math.min(
+      containerWidth, 
+      areaLeft + Math.ceil(allowedHeight * MAX_RESIZE_RATIO)
+    ),
+    min: Math.max(
+      areaLeft + areaHeight * MIN_RESIZE_RATIO,
+      areaLeft + MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset
+  let fixedRightOffset = cursorAbsoluteOffset.x
+  if (cursorAbsoluteOffset.x > rightAbsoluteOffsetInterval.max)
+    fixedRightOffset = rightAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.x < rightAbsoluteOffsetInterval.min)
+    fixedRightOffset = rightAbsoluteOffsetInterval.min
+
+  return {
+    width: areaWidth - (areaLeft + areaWidth - fixedRightOffset),
+    height: areaHeight - (areaTop + areaHeight - fixedBottomOffset)
+  }
+}
+
+const getFixedSW = (areaTop, areaLeft, areaWidth, areaHeight, containerHeight, cursorAbsoluteOffset) => {
+  let allowedWidth = areaLeft + areaWidth
+  let bottomAbsoluteOffsetInterval = {
+    max: Math.min(
+      containerHeight,
+      areaTop + allowedWidth / MIN_RESIZE_RATIO
+    ),
+    min: Math.max(
+      areaTop + areaWidth / MAX_RESIZE_RATIO,
+      areaTop + MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset based on interval
+  let fixedBottomOffset = cursorAbsoluteOffset.y
+  if (cursorAbsoluteOffset.y > bottomAbsoluteOffsetInterval.max)
+    fixedBottomOffset = bottomAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.y < bottomAbsoluteOffsetInterval.min)
+    fixedBottomOffset = bottomAbsoluteOffsetInterval.min
+  
+  let allowedHeight = containerHeight - areaTop
+  let leftAbsoluteOffsetInterval = {
+    max: Math.max(
+      0, 
+      areaLeft + areaWidth - Math.ceil(allowedHeight * MAX_RESIZE_RATIO)
+    ),
+    min: Math.min(
+      areaLeft + areaWidth - areaHeight * MIN_RESIZE_RATIO,
+      areaLeft + areaWidth - MIN_IMAGE_CROP_DIMENSION_LENGHT
+    )
+  }
+  // Get fixed offset based on interval
+  let fixedLeftOffset = cursorAbsoluteOffset.x
+  if (cursorAbsoluteOffset.x < leftAbsoluteOffsetInterval.max)
+    fixedLeftOffset = leftAbsoluteOffsetInterval.max
+  else if (cursorAbsoluteOffset.x > leftAbsoluteOffsetInterval.min)
+    fixedLeftOffset = leftAbsoluteOffsetInterval.min
+
+  return {
+    left: fixedLeftOffset,
+    width: areaWidth + areaLeft - fixedLeftOffset,
+    height: areaHeight - (areaTop + areaHeight - fixedBottomOffset)
+  }
 }
