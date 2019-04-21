@@ -78,42 +78,42 @@ class Tag extends Component {
 
   componentDidMount = () => {
     switch (this.props.type){
-      case TagTypes.NW:
+      case TagTypes.types.NW:
         this.setState({
           tagName: this.props.classes.nw
         })
         break
-      case TagTypes.N:
+      case TagTypes.types.N:
         this.setState({
           tagName: this.props.classes.n
         })
         break
-      case TagTypes.NE:
+      case TagTypes.types.NE:
         this.setState({
           tagName: this.props.classes.ne
         })
         break
-      case TagTypes.E:
+      case TagTypes.types.E:
         this.setState({
           tagName: this.props.classes.e
         })
         break
-      case TagTypes.SE:
+      case TagTypes.types.SE:
         this.setState({
           tagName: this.props.classes.se
         })
         break
-      case TagTypes.S:
+      case TagTypes.types.S:
         this.setState({
           tagName: this.props.classes.s
         })
         break
-      case TagTypes.SW:
+      case TagTypes.types.SW:
         this.setState({
           tagName: this.props.classes.sw
         })
         break
-      case TagTypes.W:
+      case TagTypes.types.W:
         this.setState({
           tagName: this.props.classes.w
         })
