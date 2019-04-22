@@ -2,7 +2,8 @@ export default {
   root: {
     width: 654,
     display: 'flex',
-    flexFlow: 'column'
+    flexFlow: 'column',
+    margin: 'auto'
   },
   title: {
     minHeight: 54,

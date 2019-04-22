@@ -12,6 +12,8 @@
   align-items: center;
   justify-content: center;
   color: white;
+  margin: auto;
+  overflow: auto;
 }
 
 .App-link {
