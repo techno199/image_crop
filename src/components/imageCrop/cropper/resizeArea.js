@@ -1,6 +1,6 @@
 import { TagTypes, MIN_IMAGE_CROP_DIMENSION_LENGHT, MIN_RESIZE_RATIO, MAX_RESIZE_RATIO } from "../../../helpers";
 
-export const resizeArea = ({
+export const fixedResizedAreaOffset = ({
   areaTop,
   areaLeft,
   areaHeight,
@@ -9,8 +9,7 @@ export const resizeArea = ({
   height,
   imgRef,
   item,
-  currentClientOffset,
-  onAreaUpdate
+  currentClientOffset
 }) => {
   let rect = imgRef.current.getBoundingClientRect()
   /** Currently dragged tag type */
@@ -49,41 +48,37 @@ export const resizeArea = ({
   // Move around with respect to actually selected tag
   switch (tagType) {
     case TagTypes.types.NW: {
-      onAreaUpdate({...getFixedNW(
+      return {...getFixedNW(
         areaTop,
         areaLeft,
         areaWidth,
         areaHeight,
         cursorAbsoluteOffset
-      )})
-      break
+      )}
     }      
     case TagTypes.types.N: {
-      onAreaUpdate({
+      return {
         top: areaTop - getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset),
         height: areaHeight + getFixedTopDelta(areaTop, areaHeight, areaWidth, cursorAbsoluteOffset)
-      })
-      break
+      }
     }
     case TagTypes.types.NE: {
-      onAreaUpdate({...getFixedNE(
+      return {...getFixedNE(
         areaTop,
         areaLeft,
         areaWidth,
         areaHeight,
         width,
         cursorAbsoluteOffset
-      )})
-      break
+      )}
     }
     case TagTypes.types.E: {
-      onAreaUpdate({
+      return {
         width: areaWidth - getFixedRightDelta(width, areaLeft, areaHeight, areaWidth, cursorAbsoluteOffset)
-      })
-      break
+      }
     }
     case TagTypes.types.SE: {
-      onAreaUpdate({...getFixedSE(
+      return {...getFixedSE(
         areaTop,
         areaLeft,
         areaWidth,
@@ -91,32 +86,28 @@ export const resizeArea = ({
         width,
         height,
         cursorAbsoluteOffset
-      )})
-      break
+      )}
     }
     case TagTypes.types.S: {
-      onAreaUpdate({
+      return {
         height: areaHeight - getFixedBottomDelta(height, areaTop, areaWidth, areaHeight, cursorAbsoluteOffset)
-      })
-      break
+      }
     }
     case TagTypes.types.SW: {
-      onAreaUpdate({...getFixedSW(
+      return {...getFixedSW(
         areaTop,
         areaLeft,
         areaWidth,
         areaHeight,
         height,
         cursorAbsoluteOffset
-      )})
-      break
+      )}
     }
     case TagTypes.types.W: {
-      onAreaUpdate({
+      return {
         left: areaLeft - getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset),
         width: areaWidth + getFixedLeftDelta(areaLeft, areaWidth, areaHeight, cursorAbsoluteOffset)
-      })
-      break
+      }
     }
     default:
       break

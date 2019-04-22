@@ -4,7 +4,7 @@ import withStyles from 'react-jss'
 import { SelectionArea } from '../selectionArea';
 import update from 'immutability-helper'
 import { fixedMoveAreaOffset } from './moveArea';
-import { resizeArea } from './resizeArea';
+import { resizeArea, fixedResizedAreaOffset } from './resizeArea';
 
 const styles = {
   img: {
@@ -124,7 +124,7 @@ const Cropper = ({
       item,
       currentClientOffset
     }) => {
-      resizeArea({
+      onAreaUpdate(fixedResizedAreaOffset({
         areaTop,
         areaLeft,
         areaHeight,
@@ -135,7 +135,7 @@ const Cropper = ({
         item,
         currentClientOffset,
         onAreaUpdate
-      })
+      }))
     }
   )
   // Update image ref on every new image
